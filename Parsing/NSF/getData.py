@@ -14,5 +14,5 @@ def main():
 	mainData = pickle.load(open("data.p", "rb"))
 	for i in mainData:
 		print(i)
-        print("\n-------------------------------------------\n")
+		print("\n-------------------------------------------\n")
 main()

@@ -31,7 +31,7 @@ for name in onlyFiles:
     #               <setSpec> Paper Specialization Here </setSpec>
     #               <categories> Paper Research Categories Here </categories>
     #               <abstract> Paper abstract Here </abstract>
-    #            </header>
+    #           </header>
     #       </arXiv>
     #   </metadata>
     # </record>

@@ -7,11 +7,35 @@
 # Outputs a pickle file
 #
 #################################
-
 import os
 import pickle
 
+global separateList
+global separateListFix
+
+def fixAbstract(abstract):
+    global separateList
+    global separateListFix
+    newAbstract = ""
+    marker = 0
+    stopIndicies = []
+    for i in range(len(abstract)):
+        if abstract[i] in separateList:
+            stopIndicies.append(i)
+
+    for i in stopIndicies:
+        j = separateList.index(abstract[i])
+        newAbstract = newAbstract + abstract[marker:i] + separateListFix[j]
+        marker = i + 1
+
+    newAbstract = newAbstract + abstract[marker:]
+    return newAbstract
+
 def main():
+    global separateList
+    global separateListFix
+    separateList = ["(", ")", "{", "}", "[", "]", ",", "<", ">", ";", ":", "-", ", " ,".", "!", "?"]
+    separateListFix = ["( ", " )", "{ ", " }", "[ ", " ]", " ,", "< ", " >", " ;", " :", " - ", " , " ," .", " !", " ?"]
     fieldDict = {}
     mainData = []
 
@@ -68,7 +92,7 @@ def main():
                             abstractFound = True
                     
                     f.close()
-                    dataset = [abstract.strip(), tags]
+                    dataset = [fixAbstract(abstract.strip()), tags]
                     mainData.append(dataset)
     
 

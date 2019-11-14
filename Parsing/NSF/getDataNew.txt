@@ -1,0 +1,203 @@
+0000099   Other Applications NEC	61526	True
+99        Other Sciences NEC	7495	True
+59        Engineering NEC	1971	False
+21        Mathematics	6902	False
+49        Environmental NEC	992	False
+61        Life Science Biological	8727	False
+12        Chemistry	4978	False
+90        Other Sciences	491	False
+31        Computer Science & Engineering	4486	False
+13        Physics	3538	False
+89        Social Sciences NEC	259	False
+19        Physical Sciences NEC	196	False
+42        Geological Sciences	5690	False
+88        Geography	463	False
+40        Environmental Sciences	240	False
+60        Life Sciences	173	False
+81        Anthropology	1250	False
+10        Physical Sciences	174	False
+0105000   Manpower & Training	2969	False
+98        Multi-Disciplinary	250	False
+0101000   Curriculum Development	572	False
+55        Engineering-Electrical	3168	False
+50        Engineering	309	False
+91        Science Technology Assess	270	False
+11        Astronomy	1236	False
+41        Atmospheric Sciences	2332	False
+43        Biological Oceanography	916	False
+20        Mathematics	238	False
+79        Psychology Sciences NEC	50	False
+80        Social Sciences	98	False
+69        Life Sciences NEC	195	False
+56        Engineering-Mechanical	2167	False
+57        Engineering-Metallurgy & Material	1082	False
+82        Economics	936	False
+0103000   Ethical Considerations	266	False
+0106000   Materials Research	8700	False
+0108000   Software Development	632	False
+0306000   Energy Research & Resources	916	False
+0109000   Structural Technology	699	False
+54        Engineering-Civil	1805	False
+72        Psychology Social Aspects	248	False
+0203000   Health	3350	False
+0206000   Telecommunications	4424	False
+0313040   Water Pollution	545	False
+0316000   Trace Contaminants	623	False
+0308000   Industrial Technology	8522	False
+30        Computer Science & Engineering	228	False
+0201000   Agriculture	1544	False
+45        Ecology	973	False
+0313000   Regional & Environmental	1140	False
+0521800   Shelf & Esturine Ecosystem	54	False
+85        Political Sciences	380	False
+53        Engineering-Chemical	1970	False
+16        Solid State Chem and Polymers	354	False
+0000912   Computer Science	426	False
+0510204   Data Banks & Software Design	254	False
+	15093	True
+0400000   Industry University - Co-op	103	False
+0111000   Science Policy	421	False
+92        Science Policy	269	False
+86        Sociology	520	False
+71        Psychology Biological Aspects	412	False
+0107000   Operations Research	360	False
+0120000   Research Involving Recombinant DNA	145	False
+0204000   Oceanography	6343	False
+0104000   Information Systems	2564	False
+0510602   Ecosystem Dynamics	1042	False
+51        Engineering-Aeronautical	64	False
+0510601   Biology of Pest Organisms	74	False
+0313020   Noise Pollution	5	False
+0512004   Analytical Procedures	99	False
+0312000   Population	1487	False
+0311000   Polar Programs-Related	2473	False
+0319000   Climate Related Activities	1277	False
+52        Engineering-Astronautical	16	False
+0112000   System Theory	412	False
+0510701   Chemical Reaction Systems	129	False
+0521400   Plant Productivity	87	False
+14        Condensed Matter Physics	572	False
+0510403   Engineering & Computer Science	808	False
+84        Linguistics	280	False
+87        Law	284	False
+0302000   Biological Pest Control	94	False
+64        Environmental Biology	1775	False
+44        Physical & Chemical Oceanography	1173	False
+0304000   Disaster & Natural Hazard	966	False
+17        Materials Theory	322	False
+0208000   Water Resources	345	False
+0304010   Earthquake	1270	False
+0510803   Mineral Leaching Process	2	False
+83        History	331	False
+0205000   Space	1591	False
+0118000   Pollution Control	335	False
+0510100   Global Carbon Cycle	101	False
+0510301   Structure & Function	584	False
+0300000   Problem-Oriented	191	False
+0304030   Flood	43	False
+18        Materials NEC	407	False
+0309000   Land Use & Planning	119	False
+0510604   Analytic Tools	109	False
+0510205   International Economic Cooperation	14	False
+0510101   Climate Models	32	False
+15        Metals, Ceramics & Electronic Materials	545	False
+0314000   Rural Development	54	False
+0510401   Nerve Growth	14	False
+0510102   Role-Terrestrial Ecosystem	224	False
+0202000   Atmospheric Science-ICAS	185	False
+0313010   Air Pollution	166	False
+0113000   Animal Welfare	79	False
+0522100   High Technology Materials	131	False
+0116000   Human Subjects	3258	False
+0512204   Nondestructive Measurement	27	False
+0207000   Transportation	93	False
+0521700   Marine Resources	67	False
+0317000   Urban Technology	147	False
+0114000   Endangered Species	122	False
+0110000   Technology Transfer	486	False
+63        Life Science Other Medical	28	False
+0510304   Electron & Energy Sources	46	False
+0510302   Energetics & Thermodynamc	35	False
+0510603   Synthetic Organic Chemistry	55	False
+0522400   Information Systems	94	False
+0304020   Extreme Wind	65	False
+0510802   Rock Properties-Mineral	19	False
+0100000   Special Interest	72	False
+0511603   Societal Aspects	74	False
+0510103   Physical Chemical Studies	68	False
+0318000   Weather Modifications	10	False
+0522300   Man-Machine Communication	22	False
+0510203   Model Validation	78	False
+0510804   Mineral Economics	2	False
+0102000   Data Banks	112	False
+0510200   Economic Instability	6	False
+0510704   Geophysical Monitoring	98	False
+0510300   Transformation of Nitrogen	73	False
+0510600   Integrated Pest Management	8	False
+65        Agricultural	160	False
+0313030   Solid Waste Disposal	28	False
+0512003   Collective Decision-Making	30	False
+0301000   Aging (Human)	13	False
+0303000   Conflict Resolution	25	False
+0511300   Nutrition	14	False
+0510402   Biomaterials-Short & Long Terms	115	False
+0510404   Sensry Physiology & Perc	25	False
+0601000   Facilities - Repair/Renovation	327	False
+70        Psychology	74	False
+0602000   Facilities - Replacement	19	False
+0512000   Population Redistribution	5	False
+0510801   Geodynamics & Mettallogen	14	False
+62        Life Science Clinical Medical	10	False
+0000904   Science Information	32	False
+0511601   Cloud & Precipitatn Process	10	False
+0510202   International Economic Modeling	14	False
+0315000   Social Data & Comm Development	79	False
+0304040   Fire	17	False
+0200000   Interagency	35	False
+0510400   Physically Disadvantaged	12	False
+0522500   Early Technology	5	False
+null	4	True
+0521500   Ozone & The Stratosphere	17	False
+0521200   Salt Tolerant Plants	7	False
+0520900   Substitute Materials	6	False
+0510201   Domestic Economic Modeling	14	False
+0512201   Improved Transient Measure	2	False
+0512202   Improved Resolution & Sen	14	False
+0510305   Photocatalysis	9	False
+0307000   Human Rights-Minority Rel	16	False
+0511301   Trace Element Content	3	False
+58        Engineering-Engineering Technology	159	False
+0512206   System Interaction	6	False
+0510303   Kinetics	18	False
+0520500   Computer Security & Privacy	2	False
+0304050   Accident	3	False
+0603000   Facilities - Combination	42	False
+0510800   Deep Mineral Deposits	4	False
+0521900   Mass Media & Socialization	5	False
+0119000   National Environmental Policy Act	4	False
+0115000   Historical Sites	15	False
+9900000     DATA NOT AVAILABLE	3	True
+0512205   Xray & Electron Beam Lith	9	False
+0510700   Deep Solution Mining	2	False
+0511303   Toxicology	8	False
+0510702   Reservoir Engineering	5	False
+0310000   Municipal Service	23	False
+0510703   Rock Fracture Mechanics	14	False
+0117000   Marine Mammal Protection	7	False
+0000908   Urban Problems	18	False
+0521000   Mineral Benefication	5	False
+0510104   Past Carbon Dioxide Level	9	False
+0305000   Drug Abuse	3	False
+0511600   Weather Modification Research	3	False
+0521100   Waste Resources	11	False
+0512200   Advanced Measurement Investment	12	False
+0511302   Role-Trace Element Component	4	False
+0305030   Drug Abuse Prevention	3	False
+0600000   Facilities	55	False
+0511602   Inadvertent Weather Effect	2	False
+0305010   Drug Abuse Effects Biol	2	False
+0512203   Improved Sensitivity-Minitr	3	False
+0121000   Proprietary & Privileged Information	1	False
+Total = 135137
+Bad Labels = 44250
+% Bad Labels = 32.74%

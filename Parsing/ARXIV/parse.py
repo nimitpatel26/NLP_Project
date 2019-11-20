@@ -18,6 +18,8 @@ def parseFile(name):
 
     global datasetPath
 
+    # Output array of the parsed data
+
     out = []
 
     file = open(datasetPath+"/"+name,mode="r",encoding="UTF-8")

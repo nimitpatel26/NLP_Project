@@ -2,19 +2,25 @@
 #
 # CMSC 473 Project
 # getData.py
-# Used to get data from the pickle file
+# Used to get the unique spec labels from the data
 # created by the parse.py function
 #
 #################################
 
 import pickle
 
+allSpec = {}
+
 def main():
 
 	mainData = pickle.load(open("arXivSpec.p", "rb"))
 	for i in mainData:
-		print(i)
-		print("\n------------------------------------\n")
+		# If a specialization is not in allSpec keys, then add it
+		for spec in i[1][0:1]:
+			if(spec not in allSpec):
+				allSpec[spec] = 0
+			allSpec[spec] += 1	
+	print(allSpec)
 
 	
 main()

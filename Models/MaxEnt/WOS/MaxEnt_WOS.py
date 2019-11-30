@@ -32,7 +32,7 @@ def getData():
 
 def main():
 
-	mainData = pickle.load(open("WOS.p", "rb"))
+	mainData = pickle.load(open("WOS.p", "rb"))[0:1000]
 	# print(len(mainData))
 	margin = len(mainData) * .2
 	flip = 0
@@ -83,13 +83,10 @@ def main():
 	X = np.array(X)
 	Y = np.array(Y)
 
-	print(X)
-	print(Y)
-
 	X_test = np.array(X_test)
 	Y_test = np.array(Y_test)
 
-	log_reg = LogisticRegression(multi_class="multinomial",solver="lbfgs", C=1, max_iter=1000)
+	log_reg = LogisticRegression(multi_class="multinomial",solver="lbfgs", C=1, max_iter=1000,n_jobs=4)
 
 	# Fit the model
 	print("FITTING THE DATA")
@@ -98,7 +95,6 @@ def main():
 	# Make prediction
 	print("MAKING PREDICTIONS")
 	Y_pred = log_reg.predict(X_test)
-
 
 	# Calculate accuracy, precision, and recall
 	print("PRINTING STATISTICS")

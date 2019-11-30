@@ -60,7 +60,7 @@ def parseFile(name):
 
             metaPrefix = "{http://arxiv.org/OAI/arXiv/}"
             info = paper.find("metadata").find(metaPrefix+"arXiv")
-            specialization = paper.find("header").find("setSpec").text.split(":")[0]
+            specialization = specialization = paper.find("header").findall("setSpec")
             categories = info.find(metaPrefix+"categories").text.split(" ")
             abstract = info.find(metaPrefix+"abstract").text
         
@@ -76,30 +76,34 @@ def parseFile(name):
 
     return out
 
-# Pool of processes for parsing the files 
-fileParsingPool = Pool()
+# This is only needed on windows and this prevents the process from running recursively
 
-# For each filename in only files, pass that into parseFile and run as a separate process in the fileParsingPool, allowing parallelism
+if __name__ == '__main__':
 
-map = fileParsingPool.map_async(parseFile,onlyFiles)
+    # Pool of processes for parsing the files 
+    fileParsingPool = Pool()
 
-# Close off the parsing process pool and then join it to the main process so we wait until all results retrieved
+    # For each filename in only files, pass that into parseFile and run as a separate process in the fileParsingPool, allowing parallelism
 
-fileParsingPool.close()
+    map = fileParsingPool.map_async(parseFile,onlyFiles)
 
-fileParsingPool.join()
+    # Close off the parsing process pool and then join it to the main process so we wait until all results retrieved
 
-number = 0
+    fileParsingPool.close()
 
-result = []
+    fileParsingPool.join()
 
-# Concatenate each file's parsed results onto the results array, this one can take a while since it's single thread
+    number = 0
 
-for res in map.get(timeout=0):
+    result = []
 
-    result = result + res
-    
+    # Concatenate each file's parsed results onto the results array, this one can take a while since it's single thread
 
-with open("arXivAll.p", 'wb') as handle:
-    
-    pickle.dump(result, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    for res in map.get(timeout=0):
+
+        result = result + res
+        
+
+    with open("arXivAll.p", 'wb') as handle:
+        
+        pickle.dump(result, handle, protocol=pickle.HIGHEST_PROTOCOL)

@@ -5,3 +5,6 @@ ARXIV/arXivFirstCategory
 ARXIV/arXivAllCategory
 ARXIV/arXivSpecialization
 ARXIV/Categorized.zip.tmp
+*.p
+*.xlsx
+*.xml

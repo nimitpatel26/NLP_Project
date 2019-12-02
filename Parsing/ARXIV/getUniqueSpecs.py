@@ -20,6 +20,8 @@ def main():
 			if(spec not in allSpec):
 				allSpec[spec] = 0
 			allSpec[spec] += 1	
+
+	print("Number of Papers: " +str(len(mainData)))
 	print(allSpec)
 
 	

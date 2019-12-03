@@ -10,11 +10,11 @@ filename = "./arXivSpecMergedTokens.p"
 
 # Top N entries to be found
 
-topN = 500
+topN = 50
 
 # ngram length
 
-n = 2
+n = 1
 
 # if your data has already been tokenized and split into ngrams with n matching that above
 
@@ -38,7 +38,7 @@ def countSentenceNGram(sentences):
 
 			sentence = sentence.split(" ") 
 
-		for i in range((len(sentence)-n)):
+		for i in range((len(sentence)-n+1)):
 			wordsAdded = {}
 			word = " ".join(sentence[i:i+n])
 			# print(" ".join(sentence[i:i+n]))
@@ -99,8 +99,8 @@ def topNotIn(i,ngramRes):
 		isNotIn = True
 
 		for i2 in ngramRes:
-
-			if(ngram in i2[1] and ngramRes[i][0] != i2[0] and c_ngram <= i2[1][ngram]):
+			# 													Likelyhood to see our gram in a abstract is lower 
+			if(ngram in i2[1] and ngramRes[i][0] != i2[0] and ( c_ngram / len(ngramRes[i][2]) ) <= ( i2[1][ngram] / len(i2[2]) )):
 
 				isNotIn = False
 
@@ -110,13 +110,13 @@ def topNotIn(i,ngramRes):
 
 			counter += 1
 
-			if(counter%(topN/10) == 0):
+			# if(counter%(topN/10) == 0):
 
-				print(ngramRes[i][0],counter)
+			# 	print(ngramRes[i][0],counter)
 
 		c += 1
 
-	print("Completed")
+	print(ngramRes[i][0],"Completed")
 
 	return ngramRes[i][0],topNList
 
@@ -156,8 +156,6 @@ if __name__ == '__main__':
 
 	del tuples
 
-	exit()
-
 	print("Got ngram results")
 
 	# ngramRes = manager.list(list(ngramRes))
@@ -184,6 +182,8 @@ if __name__ == '__main__':
 
 	del ngramRes
 
+	topSeqString = ""
+
 	for top in orderRes:
 
 		print("----------- TOP",topN,"FOR",top[0],"-----------------")
@@ -198,6 +198,10 @@ if __name__ == '__main__':
 
 			print(i,ngram,c_ngram)
 
+			topSeqString += "\"" + ngram +"\"" + ", "
+
 		print("----------- TOP",topN,"FOR",top[0],"-----------------")
+
+	print(topSeqString.replace("\\","\\\\"))
 
 # exit()

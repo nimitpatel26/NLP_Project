@@ -14,29 +14,31 @@ import time
 import numpy as np
 import math
 
+VOCAB = ["$", "{", "}", "we", "In", "show", "prove", "n", "A", "space", "some", "number", "group", "if", "G", "case", "all", "where", "function", "''", "finite", "1", "'s", "set", ":", "result", "\\mathbb", "functions", "over", "[", "2", "]", "any", "give", "class", "given", "equation", "general", "X", "when", "then", "solutions", "linear", "0", "particular", "consider", "algebra", "R", "spaces", "p", "the", "of", ".", ",", "and", "a", "in", "to", "is", ")", "(", "for", "with", "that", "We", "The", "are", "by", "as", "at", "from", "be", "an", "which", "can", "model", "field", "quantum", "have", "between", "results", "also", "two", "energy", "This", "these", "or", "not", "theory", "mass", "study", "has", "present", "find", "system", "magnetic", "phase", "than", "state", "one", "equations", "nonlinear", "chaotic", "periodic", "integrable", "solitons", "chaos", "soliton", "hierarchy", "turbulence", "orbits", "synchronization", "Lyapunov", "bifurcation", "exponents", "unstable", "flows", "exponent", "semiclassical", "oscillators", "Lax", "turbulent", "transformations", "Toda", "nonlinearity", "lattices", "integrability", "fractal", "trajectories", "billiard", "KdV", "bifurcations", "attractor", "hierarchies", "forcing", "KP", "intermittency", "solitary", "dissipative", "nonlocal", "cascade", "Bethe", "attractors", "front", "convection", "billiards", "Painlev\\", "Reynolds", "perturbed", "oscillatory", "population", "cell", "protein", "cells", "species", "biological", "DNA", "brain", "gene", "proteins", "patterns", "activity", "neurons", "growth", "evolutionary", "genetic", "functional", "response", "sequences", "populations", "expression", "genes", "individual", "disease", "mechanisms", "individuals", "mathematical", "binding", "cancer", "structural", "reaction", "connectivity", "fitness", "cellular", "genome", "folding", "biology", "membrane", "mutations", "RNA", "neuronal", "mutation", 
+"tissue", "quantitative", "phylogenetic", "regulatory", "sites", "epidemic", "diversity", "synaptic", "on", "this", "paper", "problem", "our", "algorithm", "network", "it", "such", "using", "proposed", "based", "performance", "approach", "time", "information", "new", "networks", "propose", "used", "systems", "algorithms", "Our", "more", "each", "use", "work", "framework", "problems", "image", "graph", "provide", "how", "To", "neural", "applications", "training", "novel", "However", "optimal", "most", "design", "features", "many", "demonstrate", "complexity", "deep", "while", "images", "techniques", "data", "models", "learning", 
+"method", "methods", "distribution", "analysis", "estimation", "regression", "process", "Bayesian", "inference", "sample", "statistical", "estimator", "distributions", "classification", "variables", "test", "error", "Gaussian", "probability", "machine", "estimators", "prediction", "selection", "likelihood", "sampling", "estimate", "samples", "often", "procedure", "studies", "sparse", "prior", "empirical", "simulation", "develop", "noise", "latent", "clustering", "loss", "posterior", "gradient", "setting", "mean", "variable", "robust", "Markov", "modeling", "market", "price", "risk", "financial", "volatility", "stock", "stochastic", "markets", "prices", "portfolio", "pricing", "trading", "economic", "asset", "returns", "series", "options", "option", "strategy", "measures", "strategies", "agents", "impact", "investment", "utility", "wealth", "stocks", "return", "assets", "costs", "capital", "default", "countries", "trade", "credit", "hedging", "transaction", "European", "income", "Brownian", "portfolios", "economy", "firms", "crisis", "investors", "finance", "&", "martingale", "implied", "arbitrage", "signal", "speech", "signals", "imaging", "reconstruction", "audio", "conventional", "speaker", "acoustic", "MIMO", "filter", "sound", "music", "localization", "antenna", "communications", "MRI", "ASR", "EEG", "beamforming", "radar", "RF", "voice", "5G", "mmWave", "UAV", "diagnosis", "filters", "CT", "DNN", "acquisition", "denoising", "SNR", "waveform", "speakers", "UAVs", "dB", "emotion", "artifacts", "ECG", "acquired", "MR", "NOMA", "precoding", "aerial", "reconstruct", "musical", "signal-to-noise", "learning-based", "battery", "quantile", "heterogeneity", "preferences", "panel", "equilibria", "endogenous", "unobserved", "welfare", "preference", "econometric", "instrumental", "consumers", "counterfactual", "travel", "IV", "regressors", "strategic", "beliefs", "regional", "wage", 
+"seller", "households", "regressions", "logit", "cross-sectional", "incentives", "sieve", "GMM", "auctions", "econometrics", "participation", "loadings", "household", "EV", "disparity", "sender", "voters", "regressor", "heteroskedasticity", "Shapley", "rebalancing", "democracy", "2SLS", "agricultural", "women", "labour", "\\texttt", "panels", "willingness", "VB", ", we", ") $", "of a", "$ .", ". In", "$ ,", "} $", "of $", "show that", "$ is", "In this", "is a", "this paper", "$ and", "and $", "to a", "} (", "number of", "prove that", "is the", "\\mathbb {", "$ (", "We show", "We also", ", $", "we show", "on a", "of this", "We prove", "for a", "class of", "terms of", "in $", "in terms", "$ of", ", where", "we prove", "$ G", "G $", "} )", "set of", ". As", "\\mathcal {", "study the", "$ n", "n $", "paper we", "$ \\mathbb", "it is", "on $", "of the", "in the", ". The", ". We", "to the", ", and", ", the", "for the", "on the", "and the", "that the", "with the", "can be", ". This", "from the", ", which", "in a", "by the", "with a", ") .", "to be", "at the", ") ,", "as a", ", in", "find that", ". It", ". A", "between the", "due to", ". For", "by a", 
+"as the", "We present", ") and", "the $", ". These", "We find", "and a", "properties of", "^ {", "which is", ", with", "It is", "as well", "of these", "has been", ", but", "In the", "well as", "dynamics of", "equation .", "equations .", "the dynamics", "phase space", "dynamics .", "numerical simulations", "dynamical systems", "systems with", "equation ,", "stability of", "the nonlinear", "periodic orbits", "of motion", "a system", "of nonlinear", "equation is", "the chaotic", "the stability", "equations are", "equations for", "solutions are", "chaotic systems", "of chaotic", "Lyapunov exponents", "dynamical system", "the scaling", "the semiclassical", "integrable systems", "of coupled", "a nonlinear", "Lyapunov exponent", "system with", "systems are", "cellular automata", "initial conditions", "dynamics is", "dynamics ,", "the Hamiltonian", "chaos .", "hierarchy .", "equation and", "the soliton", "solitons in", "Painlev\\ '", "statistics of", "of integrable", "random matrix", "nonlinear Schr\\", "Hamiltonian systems", "model of", "the population", "the brain", "The model", "gene expression", "changes in", "cells .", "the cell", "of protein", "of biological", "of DNA", "the protein", "response to", "proteins .", "species .", "a population", "cells ,", "of proteins", "the human", "of gene", "emergence of", "patterns of", "of neurons", "interactions between", "levels of", "network of", "of cells", "populations .", "of neural", "neurons .", "of human", "networks of", "population .", "the emergence", "of species", "mathematical model", "the DNA", "of individual", "of cell", "steady state", "involved in", "population size", "biological systems", "amino acid", "proteins ,", "amino acids", "the genetic", "species ,", "sequences .", "the evolutionary", "based on", "paper ,", ". Our", ", a", "such as", "we propose", "propose a", ". However", ". To", "However ,", "This paper", "the problem", "a novel", ", it", "of our", "problem of", "performance of", "O (", "we present", "this work", "order to", ", such", "the performance", ", our", "that are", "use of", "the network", "that our", "that can", "networks .", "able to", "work ,", "problem .", "a set", "algorithm for", ", to", "in order", "problem ,", "i.e. ,", "results show", "the best", "$ O", "approach to", "time .", "this problem", "our approach", "algorithm is", "used in", ", an", "network .", "data .", "We propose", "machine learning", "the data", "models .", "the model", "neural networks", "data ,", "method is", "Monte Carlo", "methods .", "models ,", "applied to", "demonstrate the", "our method", "estimation of", "method for", "to estimate", "of data", "approach is", "data and", "methods for", "data sets", "distribution .", "develop a", "the underlying", "method to", "learning .", "real data", "the sample", "methods ,", "of interest", "estimate the", "maximum likelihood", "in many", "the training", "deep neural", "we develop", "datasets .", "sample size", "distributions .", "data from", "methods are", "reinforcement learning", "method ,", "models are", "variables .", "analysis .", "data is", "learning ,", "the market", "time series", "the optimal", "the price", "markets .", "of financial", "market .", "stock market", "financial markets", "process .", "stochastic volatility", "the distribution", "risk measures", "the value", "the stock", "the volatility", "the financial", "financial market", "price of", "of market", "the risk", "transaction costs", "power law", "in financial", "Brownian motion", "impact of", "interest rate", "processes .", "of risk", "prices .", "stock price", "systemic risk", "value function", "a stochastic", "markets ,", "market ,", "the impact", "risk .", "of time", "option pricing", "of stock", "implied volatility", "volatility .", "process ,", "an optimal", "a financial", "series .", "the pricing", "the portfolio", "prices of", "the proposed", "neural network", "The proposed", "proposed method", "deep learning", "is proposed", "images .", "network (", "convolutional neural", "speech recognition", "a deep", "signal processing", ". Simulation", "signals .", "the signal", "the conventional", "Simulation results", "error rate", "simulation results", "CNN )", "( CNN", ") based", "channel estimation", ") systems", "signal .", "ratio (", "% and", "The performance", "communication systems", "base station", "rate (", "is trained", "Neural Network", "is evaluated", "of speech", "multiple access", "MIMO )", "image quality", "( MIMO", "speech enhancement", "and power", "the receiver", "power consumption", "massive MIMO", "wireless communication", "signals ,", "signal-to-noise ratio", "power system", "noise ,", "generative adversarial", "treatment effects", "treatment effect", "panel data", "average treatment", "quantile regression", "an empirical", "and inference", "empirical application", "fixed effects", "This study", "the treatment", "inference on", "test for", "literature on", "discrete choice", "in economics", "instrumental variables", "Nash equilibrium", "standard errors", "unobserved heterogeneity", "asymptotic distribution", "estimators and", "heterogeneity in", "causal effects", "of treatment", "inference methods", "I show", "social welfare", "confidence bands", "paper develops", "the United", ". Monte", "economics and", "game theory", "sample properties", "conditional on", "economics .", "equilibrium ,", "preferences .", "the identified", "data models", "propensity score", "2018 )", "identified set", "instrumental variable", "finite samples", "heterogeneity .", "bias .", "the players", "Nash equilibria"]
+LABELS = {'math': 1, 'physics': 2, 'nlin': 3, 'q-bio': 4,
+          'cs': 5, 'stat': 6, 'q-fin': 7, 'econ': 8, 'eess': 9}
 
-DATA = {}
-FILES_PER_LABEL = {}
-VOCAB = ["the", "of", "and", "to", "a", "in", "is", "for", "that", "with", "The", "on", "this", "are", "by", "In", "an", "as", "we", "be", "can", "which", "from", "This", "data", "using", "We", "results", "based", "has", "used", "have", "paper", "proposed", "also", "it", "such", "or", "been", "method", "our", "(C)", "these", "different", "paper,", "system", "not", "new", "at", "show", "their", "two", "Elsevier", "algorithm", "more", "performance", "between", "model", "analysis", "All", "its", "use", "into", "rights", "reserved.", "computer", "approach", "was", "A", "present", "study", "one", "other", "information", "However,", "than", "propose", "both", "To", "were", "time", "number", "most", "important", "design", "2016", "each", "provide", "systems", "but", "methods", "many", "order", "high", "all", "software", "Our", "well", "through", "only", "network", "problem", "when", "It", "large", "research", "some", "computing", "set", "process", "novel", "image", "algorithms", "compared", "applications", "learning", "developed", "processing", "several", "existing", "various", "over", "first", "development", "application", "work", "while", "how", "may", "applied", "efficient", "demonstrate", "including", "security", "distributed", "where", "three", "B.V.", "Ltd.", "parallel", "they", "provides", "techniques", "improve", "multiple", "will", "models", "experimental", "computational", "very", "complex", "solutions", "better", "programming", "key", "obtained", "presents", "then", "These", "features", "framework", "implementation", "any", "For", "support", "same", "data.", "real", "due", "without", "structure", "there", "solution", "As", "control", "accuracy", "under", "systems.", "about", "main", "significant", "during", "presented", "problems", "effective", "machine", "terms", "within", "technique", "potential", "need", "case", "Finally,", "further", "experiments", "implemented", "detection", "related", "structures", "studies", "allows", "efficiency", "available", "operating", "specific", "achieve", "possible", "quality", "out", "designed", "performed", "so", "traditional", "current", "images", "found", "among", "function", "single", "Furthermore,", "With", "up", "them", "tool", "field", "user", "Moreover,", "approaches", "called", "significantly", "system.", "simulation", "computation", "via", "given", "evaluate", "evaluation", "addition,", "identify", "test", "applications.", "level", "scheme", "able", "those", "because", "2017", "knowledge", "recent", "no", "common", "known", "networks", "could", "feature", "best", "dynamic", "widely", "technology", "become", "help", "engineering", "effectiveness", "higher", "management", "types", "reduce", "parameters", "solve", "optimization", "communication", "result", "uses", "make", "often", "standard", "required", "power", "shows", "By", "Therefore,", "even", "shown", "describe", "find", "classification", "study,", "improved", "low", "role", "simple", "linear", "develop", "general", "showed", "optimal", "small", "access", "highly", "being", "characteristics", "way", "local", "against", "database", "data,", "obtain", "generated", "method,", "good", "analyze", "range", "state-of-the-art", "properties", "associated", "relational", "human", "architecture", "distribution", "introduce", "perform", "useful", "tools", "proposes", "space", "conducted", "previous", "considered", "Inc.", "source", "state", "functions", "major", "An", "cost", "users", "increasing", "Based", "complexity", "memory", "vision", "point", "address", "investigate", "identified", "increase", "method.", "evaluated", "thus", "time.", "methods.", "environment", "if", "model.", "size", "systems,", "four", "task", "demonstrated", "focus", "comparison", "still", "requires", "future", "form", "databases", "numerical", "like", "suitable", "area", "target", "similar", "after", "symbolic", "detect", "part", "modeling", "practical", "especially", "problem.", "real-time", "energy", "students", "search", "Using", "nonlinear", "type", "2015", "should", "robust", "much", "determine", "ability", "work,", "3D", "code", "open", "hardware", "algorithm.", "makes", "issues", "challenges", "means", "providing", "model,", "corresponding", "article", "accurate", "domain", "limited", "mobile", "global", "effect", "rate", "achieved", "mechanism", "visual", "performance.", "strategy", "do", "provided", "requirements", "less", "analyzed", "values", "virtual", "challenging", "interaction", "generate", "input", "difficult", "aim", "random", "objective", "certain", "devices", "amount", "statistical", "critical", "resulting", "variety", "graphics", "fast", "platform", "changes", "discuss", "system,", "digital", "along", "value", "understanding", "overall", "allow", "introduced", "basic", "tasks", "resources", "integrated", "error", "storage", "across", "since", "spatial", "processes", "sets", "few", "analysis.", "second", "solving", "automatically", "does", "impact", "implement", "effectively", "require", "made", "efficiently", "bioinformatics", "language", "total", "Experimental", "context", "algorithms.", "behavior", "cannot", "lower", "time,", "conventional", "generation", "needs", "algorithm,", "tested", "basis", "compare", "program", "physical", "process.", "Results:", "patterns", "Wiley", "patients", "treatment", "had", "clinical", "disease", "Methods:", "increased", "=", "risk", "who", "health", "effects", "Conclusions:", "levels", "Background:", "age", "factors", "years", "group", "included", "reported", "findings", "review", "Conclusion:", "2", "patients.", "<", "evidence", "There", "suggest", "observed", "assessed", "1", "care", "association", "patient", "whether", "did", "symptoms", "chronic", "therapy", "assess", "women", "primary", "activity", "differences", "groups", "3", "diagnosis", "mean", "cell", "reduced", "decreased", "positive", "early", "factor", "healthy", "children", "response", "regression", "cells", "examined", "measured", "expression", "outcomes", "participants", "investigated", "revealed", "aimed", "treated", "Objective:", "respectively.", "Results", "greater", "prevalence", "Patients", "therapeutic", "following", "relationship", "Although", "medical", "95%", "patients,", "population", "blood", "study.", "rates", "likely", "ratio", "sample", "protein", "+/-", "examine", "efficacy", "mechanisms", "before", "body", "life", "cases", "inflammatory", "months", "stress", "individuals", "regarding", "cohort", "however,", "disease.", "(n", "presence", "negative", "diseases", "treatment.", "6", "12", "intervention", "4", "analyses", "Health", "(p", "baseline", "confidence", "report", "completed", "age,", "aged", "outcome", "functional", "received", "might", "social", "influence", "10", "normal", "severe", "disorder", "p", "collected", "drug", "difference", "followed", "Data", "per", "involved", "cancer", "either", "change", "acute", "incidence", "follow-up", "loss", "adverse", "period", "whereas", "serum", "assessment", "disorders", "measures", "brain", "scores", "score", "least", "reduction", "literature", "status", "skin", "diagnosed", "5", "groups.", "male", "After", "subjects", "correlated", "Published", "cause", "gene", "No", "weight", "according", "interventions", "induced", "history", "characterized", "years.", "long-term", "needed", "indicated", "years,", "associations", "female", "cognitive", "particularly", "infection", "Of", "strategies", "group.", "indicate", "days", "syndrome", "and/or", "population.", "controls", "independent", "remains", "would", "(P", "conditions", "Among", "receptor", "cross-sectional", "determined", "family", "bone", "disease,", "P", "index", "mass", "suggests", "exposure", "frequency", "underlying", "Study", "decrease", "underwent", "purpose", "active", "randomized", "prevention", "people", "interval", "include", "logistic", "CI", "pain", "poor", "correlation", "older", "play", "relevant", "men", "previously", "studied", "controlled", "severity", "having", "At", "diagnostic", "weeks", "affect", "affected", "survey", "statistically", "trials", "developing", "mental", "experience", "contribute", "improvement", "tissue", "importance", "imaging", "lead", "adult", "water", "construction", "building", "environmental", "surface", "material", "green", "smart", "harvesting", "rainwater", "solar", "soil", "project", "materials", "bridge", "pollution", "monitoring", "areas", "carried", "natural", "sustainable", "temperature", "geotextile", "sensing", "remote", "structural", "suspension", "tests", "thermal", "urban", "projects", "buildings", "maximum", "economic", "2014", "capacity", "flow", "production", "ambient", "average", "demand", "consumption", "aims", "technologies", "land", "Water", "climate", "activities", "impacts", "-", "concentration", "mechanical", "caused", "selected", "samples", "supply", "conditions.", "rainfall", "alternative", "mainly", "environment.", "appropriate", "great", "promising", "composite", "light", "industry", "layer", "employed", "series", "combined", "methodology", "combination", "considering", "Society", "degrees", "estimated", "sources", "sustainability", "enhance", "daily", "carbon", "element", "increases", "sensor", "growth", "wind", "load", "density", "measurements", "benefits", "concept", "reference", "estimate", "strength", "relative", "around", "established", "electrical", "signal", "circuit", "voltage", "controller", "output", "electric", "operational", "analog", "presented.", "circuits", "operation", "amplifier", "motor", "electricity", "filter", "identification", "PID", "CMOS", "stability", "simulations", "speed", "measurement", "representation", "feedback", "phase", "parameter", "gain", "mu", "generator", "transfer", "converter", "theoretical", "noise", "differential", "simulated", "derived", "verified", "mode", "m", "microcontroller", "components", "hybrid", "consists", "signals", "estimation", "dynamics", "paper.", "mathematical", "equivalent", "controllers", "state-space", "transmission", "tracking", "controller.", "adaptive", "graph", "proposed.", "device", "loop", "prototype", "advantages", "describes", "Simulation", "control.", "connected", "circuits.", "electronic", "wide", "example", "sensitivity", "drive", "external", "procedure", "switching", "direct", "coupled", "validated", "fuel", "matrix", "industrial", "equations", "grid", "constant", "passive", "DC", "network.", "results.", "renewable", "transient", "described", "tuning", "directly", "additional", "integration", "delay", "unit", "continuous", "theory", "verify", "fuzzy", "parameters.", "molecular", "chain", "blotting", "reaction", "genes", "genetic", "biology", "polymerase", "DNA", "detected", "expressed", "cells.", "acid", "Northern", "proteins", "Southern", "metabolism", "confirmed", "Here,", "species", "biological", "immune", "mRNA", "quantitative", "enzyme", "PCR", "RNA", "cellular", "cells,", "sequence", "vitro", "tumor", "metabolic", "transcription", "regulation", "assay", "reverse", "tissues", "isolated", "enzymes", "plant", "essential", "binding", "suggesting", "activation", "resistance", "vivo", "blotting.", "formation", "roles", "pathways", "genome", "signaling", "genomic", "pathway", "virus", "plants", "sequencing", "containing", "amino", "lines", "mice", "stem", "region", "suggested", "responses", "resulted", "sequences", "produced", "mouse", "individual", "plays", "differentiation", "assays", "rapid", "enhanced", "host", "concentrations", "bacterial", "cDNA", "Thus,", "regulatory", "Western", "interactions", "blotting,", "species.", "chemical", "transgenic", "metabolism.", "substrate", "inhibition", "recently", "T", "I", "Recent", "markers", "physiological", "addition", "(c)", "mutations", "acids", "encoding", "unique", "liver", "nuclear", "leading", "distinct", "five", "Here", "manufacturing", "fluid", "engine", "internal", "combustion", "heat", "pressure", "gas", "finite", "computer-aided", "hydraulic", "velocity", "calculated", "mechanics", "design.", "Engineering", "volume", "materials.", "boundary", "analytical", "initial", "machines", "University", "thermodynamic", "predict", "design,", "hydraulics", "advanced", "product", "thermodynamics", "air", "account", "geometry", "working", "Manufacturing", "equation", "flux", "detailed", "transport", "cycle", "discussed", "length", "discussed.", "engineering.", "channel", "vehicle", "variation", "torque", "fundamental", "larger", "three-dimensional", "free", "necessary", "materials,", "force", "shear", "attention", "emotional", "gender", "personality", "implications", "Participants", "psychological", "behavioral", "child", "depression", "perceived", "predicted", "psychiatric", "young", "relationships", "behaviors", "behavior.", "abuse", "disorders.", "sexual", "little", "explore", "violence", "toward", "adults", "affective", "(i.e.,", "(N", "depressive", "measure", "positively", "lack", "prenatal", "what", "While", "consistent", "eating", "public", "adolescents", "variables", "experiences", "focused", "relation", "anxiety", "aspects", "nonverbal", "attitudes", "media", "mediated", "strong", "neural", "prosocial", "perception", "understand", "community", "Findings", "towards", "yet", "(e.g.,", "violent", "antisocial", "education", "particular", "developmental", "development.", "schizophrenia", "others", "disorder.", "childhood", "mood", "behavior,", "Research", "perceptions", "examines", "prior", "emotion", "recognition"]
-LABELS = {'math': 1, 'physics': 2, 'nlin': 3, 'q-bio': 4, 'cs': 5, 'stat': 6, 'q-fin': 7, 'econ': 8, 'eess': 9}
+# def countVocab(sentence, label):
+# 	wordsAdded = []
+# 	for i in sentence:
+# 		key = DATA.get(label)
+# 		if key == None:
+# 			DATA[label] = {i:1}
+# 			wordsAdded.append(i)
+# 		else:
+# 			keyVocab = key.get(i)
+# 			if keyVocab == None:
+# 				key[i] = 1
+# 			elif i not in wordsAdded:
+# 				key[i] = keyVocab + 1
+# 				wordsAdded.append(i)
 
-def countVocab(sentence, label):
-	wordsAdded = []
-	for i in sentence:
-		key = DATA.get(label)
-		if key == None:
-			DATA[label] = {i:1}
-			wordsAdded.append(i)
-		else:
-			keyVocab = key.get(i)
-			if keyVocab == None:
-				key[i] = 1
-			elif i not in wordsAdded:
-				key[i] = keyVocab + 1
-				wordsAdded.append(i)
-
-def getData():
-	None
+# def getData():
+# 	None
 
 featureDict = OrderedDict()
 
@@ -61,45 +63,71 @@ def abstractFeatureLabel(abstract):
 
 	return X,Y
 
+featureN = [1,2]
+
 def abstractFeatureLabels(abstracts):
 
+	global featureN
 	global featureDict
 	global LABELS
 
 	X = dok_matrix((len(abstracts),len(VOCAB)))
 	# Y =  [ [ 0 for i in range(0,1) ] for j in range(0,len(abstracts)) ]
 	Y = []
+
+	# a = some abstract number
 	
 	for a in range(0,len(abstracts)):
 
-		for j in abstracts[a][0]:
+		sentence = abstracts[a][0].split(" ")
 
-			if j in featureDict:
+		# j = some token in the abstract
 
-				X[a,featureDict[j]] = 1
+		for n in featureN:
 
-		# Y[a][0] = (LABELS[abstracts[a][1][0]])
+			for i in range((len(sentence)-n+1)):
+
+				gram = " ".join(sentence[i:i+n])
+
+				if gram in featureDict:
+
+					X[a,featureDict[gram]] = 1
+
+				del gram
+
+				gram = None
+
+		del sentence
+
+		sentence = None
+
 		Y.append(LABELS[abstracts[a][1][0]])
+
+	del abstracts
+
+	abstracts = None
 
 	return X,Y
 
 # Instead of creating 20 data splits, create a split for each abstract in the data
 def featureArraysNSplits(data):
 
-	mp.set_start_method("spawn")
-
 	argtuples = []
 
 	for a in data:
 		argtuples.append((a[0],a[1]))
 
-	abstractParsingPool = Pool()
+	abstractParsingPool = Pool(processes=10)
 	
 	map = abstractParsingPool.map_async(abstractFeatureLabel,argtuples)
 
 	abstractParsingPool.close()
 
 	abstractParsingPool.join()
+
+	del argtuples
+	
+	argtuples = None
 	
 	res = map.get(timeout=0)
 
@@ -108,9 +136,11 @@ def featureArraysNSplits(data):
 
 def main():
 
+	mp.set_start_method("spawn")
+
 	start = time.time()
 
-	mainData = pickle.load(open("arXivSpec.p", "rb"))
+	mainData = pickle.load(open("arXivSpecMergedTokens.p", "rb"))
 
 	# split the data array into lists of tuples, each 1/20th the size of the original data
 
@@ -124,9 +154,13 @@ def main():
 
 		argtuples20[a%20].append((mainData[a][0],mainData[a][1]))
 
+	del mainData
+
+	mainData = None
+
 	# each tuple list will get a process mapped to it, total of 20 processes in the pool
 
-	abstractParsingPool = Pool()
+	abstractParsingPool = Pool(processes=10)
 
 	map = abstractParsingPool.map_async(abstractFeatureLabels,argtuples20)
 
@@ -137,6 +171,10 @@ def main():
 	# get the results from the processes that processed the data
 	
 	res = map.get(timeout=0)
+
+	del argtuples20
+
+	argtuples20 = None
 
 	print("Got result in \t" +str(time.time()-start) + " s")
 

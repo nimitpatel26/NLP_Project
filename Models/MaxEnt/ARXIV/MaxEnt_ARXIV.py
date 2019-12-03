@@ -9,6 +9,7 @@ from sklearn.metrics import recall_score
 from scipy.sparse import dok_matrix,vstack
 from collections import OrderedDict
 from multiprocessing import Pool, Process
+import multiprocessing as mp
 import time
 import numpy as np
 import math
@@ -84,6 +85,8 @@ def abstractFeatureLabels(abstracts):
 
 # Instead of creating 20 data splits, create a split for each abstract in the data
 def featureArraysNSplits(data):
+
+	mp.set_start_method("spawn")
 
 	argtuples = []
 

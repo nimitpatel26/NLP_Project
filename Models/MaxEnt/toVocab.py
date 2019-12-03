@@ -2,9 +2,11 @@ import pickle
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk import ngrams
 from collections import OrderedDict
-from multiprocessing import Pool,Manager,Value
+from multiprocessing import Pool,Manager
+import multiprocessing as mp
+import gc
 
-filename = "./WOS.p"
+filename = "./arXivSpecMergedTokens.p"
 
 # Top N entries to be found
 
@@ -16,9 +18,11 @@ n = 2
 
 # if your data has already been tokenized and split into ngrams with n matching that above
 
-pretokened = False
+pretokened = True
 
 def countSentenceNGram(sentences):
+
+	global n
 
 	v_dict = {}
 
@@ -26,16 +30,18 @@ def countSentenceNGram(sentences):
 
 	for sentence in sentences[1]:
 
-		if(not pretokened): 
-			sentence = list(word_tokenize(sentence))
-		else:
-			sentence = sentence.split(" ")
-		
-		sentence = list(ngrams(sentence, n))
+		if(not pretokened):
 
-		for gram in sentence:
+			sentence = list(word_tokenize(sentence))
+
+		else:
+
+			sentence = sentence.split(" ") 
+
+		for i in range((len(sentence)-n)):
 			wordsAdded = {}
-			word = " ".join(gram)
+			word = " ".join(sentence[i:i+n])
+			# print(" ".join(sentence[i:i+n]))
 			if word not in v_dict:
 				v_dict[word] = 0
 			if word not in wordsAdded:
@@ -70,9 +76,9 @@ def groupByLabelIntoDict(f):
 
 			labels[l].append(a[0])
 
-	return labels
+	del data
 
-ngramRes = 0 
+	return labels
 
 def topNotIn(i,ngramRes):
 
@@ -116,7 +122,9 @@ def topNotIn(i,ngramRes):
 
 if __name__ == '__main__':
 
-	manager = Manager()
+	mp.set_start_method("spawn")
+
+	# manager = Manager()
 
 	groupedDict = groupByLabelIntoDict(filename)
 
@@ -128,9 +136,15 @@ if __name__ == '__main__':
 
 		tuples.append((k,groupedDict[k]))
 
+	# tuples = [(list(groupedDict.keys())[0],groupedDict[list(groupedDict.keys())[0]])]
+
 	del groupedDict
 
-	ngramPool = Pool()
+	groupedDict = {}
+
+	ngramPool = mp.Pool()
+
+	gc.collect()
 
 	map = ngramPool.map_async(countSentenceNGram,tuples)
 
@@ -142,13 +156,15 @@ if __name__ == '__main__':
 
 	del tuples
 
+	exit()
+
 	print("Got ngram results")
 
 	# ngramRes = manager.list(list(ngramRes))
 
 	ngramRes = list(ngramRes)
 
-	topNPool = Pool()
+	topNPool = mp.Pool()
 
 	map = []
 	
@@ -163,6 +179,7 @@ if __name__ == '__main__':
 	orderRes = []
 
 	for p in map:
+
 		orderRes.append(p.get(timeout=0))
 
 	del ngramRes

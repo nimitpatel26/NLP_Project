@@ -12,7 +12,7 @@ topN = 500
 
 # ngram length
 
-n = 2
+n = 6
 
 def countSentenceNGram(label, sentences, n):
 	
@@ -58,7 +58,7 @@ def groupByLabelIntoDict(file):
 
 ngramRes = 0 
 
-def topNotIn(labelNgram):
+def topNotIn(i):
 
 	global topN
 
@@ -70,25 +70,25 @@ def topNotIn(labelNgram):
 
 	topNList = []
 
-	while c < len(labelNgram[1]) and counter < topN:
+	while c < len(ngramRes[i][2]) and counter < topN:
 
 		isNotIn = True
 
 		for i2 in ngramRes:
 
-			if(labelNgram[2][c][0] in i2[2][:c+1] and labelNgram[0] != i2[0]):
+			if(ngramRes[i][2][c][0] in i2[2][:c+1] and ngramRes[i][0] != i2[0]):
 
 				isNotIn = False
 
 		if(isNotIn): 
 
-			topNList.append((labelNgram[2][c],labelNgram[1][labelNgram[2][c]]))
+			topNList.append((ngramRes[i][2][c],ngramRes[i][1][ngramRes[i][2][c]]))
 
 			counter += 1
 
 		c += 1
 
-	return labelNgram[0],topNList
+	return ngramRes[i][0],topNList
 
 def main(): 
 
@@ -126,15 +126,19 @@ def main():
 
 	print("Got ngram results")
 
+	ngramRes = list(ngramRes)
+
 	topNPool = Pool()
 	
-	map = topNPool.map_async(topNotIn,ngramRes)
+	map = topNPool.map_async(topNotIn,range(len(ngramRes)))
 
 	topNPool.close()
 
 	topNPool.join()
 
 	orderRes = map.get(timeout=0)
+
+	del ngramRes
 
 	for top in orderRes:
 

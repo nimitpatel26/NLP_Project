@@ -1,5 +1,3 @@
-
-
 import pickle
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk import ngrams
@@ -7,70 +5,157 @@ from collections import OrderedDict
 from multiprocessing import Pool
 
 filename = "WOS.p"
-VOCAB = {}
-LABELS = OrderedDict()
 
-def countSentenceNGram(label, sentences, n):
-	
-	VOCAB = {}
+# Top N entries to be found
 
-	VOCAB[label] = {}
+topN = 500
 
-	for sentence in sentences:
-
-		sentence = list(word_tokenize(sentence))
-		sentence = set(list(ngrams(sentence, n)))
-
-		wordsAdded = {}
-		for i in sentence:
-			word = " ".join(list(i))
-			if word not in VOCAB[label]:
-				VOCAB[label][word] = 0
-			VOCAB[label][word] += 1
-
-	sortedList = sorted(VOCAB[label].items(), key=lambda x: x[1], reverse=True)
-
-	return (label,sortedList,n)
-
-def topLevelDict():
-
-	mainData = pickle.load(open(filename, "rb"))
-
-	for a in mainData:
-
-		for l in a[1]:
-
-			if l not in LABELS:
-
-				LABELS[l] = []
-
-			LABELS[l].append(a[0])
-	
-topLevelDict()
-
-keys = []
-
-sentences = []
+# ngram length
 
 n = 2
 
-for key in list(LABELS.keys()):
+def countSentenceNGram(label, sentences, n):
+	
+	v_dict = {}
 
-	keys.append((key,LABELS[key],2))
+	for sentence in sentences:
 
-ngramPool = Pool()
+		sentence = word_tokenize(sentence)
+		sentence = ngrams(sentence, n)
 
-map = ngramPool.starmap_async(countSentenceNGram,keys)
+		for i in sentence:
+			wordsAdded = {}
+			word = " ".join(i)
+			if word not in v_dict:
+				v_dict[word] = 0
+			if word not in wordsAdded:
+				wordsAdded[word] = 0
+				v_dict[word] += 1
 
-ngramPool.close()
+	sortedList = sorted(v_dict.keys() , key = lambda x: v_dict[x], reverse=True)
 
-ngramPool.join()
+	return (label,v_dict,sortedList,n)
 
-res = map.get(timeout=0)
+# Group abstracts into a dictionary where highest level label is the specialization and the lower is abstracts in that spec
 
+def groupByLabelIntoDict(file):
 
-print(res[0][0])
-print(res[0][1][:100])
+	labels = OrderedDict()
 
+	data = pickle.load(open(file, "rb"))
+
+	for a in data:
+
+		for l in a[1]:
+
+			if l not in labels:
+
+				labels[l] = []
+
+			labels[l].append(a[0])
+
+	return labels
+
+ngramRes = 0 
+
+def topNotIn(labelNgram):
+
+	global topN
+
+	global ngramRes
+
+	counter = 0
+
+	c = 0
+
+	topNList = []
+
+	while c < len(labelNgram[1]) and counter < topN:
+
+		isNotIn = True
+
+		for i2 in ngramRes:
+
+			if(labelNgram[2][c][0] in i2[2][:c+1] and labelNgram[0] != i2[0]):
+
+				isNotIn = False
+
+		if(isNotIn): 
+
+			topNList.append((labelNgram[2][c],labelNgram[1][labelNgram[2][c]]))
+
+			counter += 1
+
+		c += 1
+
+	return labelNgram[0],topNList
+
+def main(): 
+
+	global filname
+
+	global ngramRes
+
+	global topN
+
+	global n
+
+	labels = groupByLabelIntoDict(filename)
+
+	tuples = []
+
+	sentences = []
+
+	for key in list(labels.keys()):
+
+		tuples.append((key,labels[key],n))
+
+	ngramPool = Pool()
+
+	map = ngramPool.starmap_async(countSentenceNGram,tuples)
+
+	ngramPool.close()
+
+	ngramPool.join()
+
+	ngramRes = map.get(timeout=0)
+
+	del labels
+
+	del tuples
+
+	print("Got ngram results")
+
+	topNPool = Pool()
+	
+	map = topNPool.map_async(topNotIn,ngramRes)
+
+	topNPool.close()
+
+	topNPool.join()
+
+	orderRes = map.get(timeout=0)
+
+	for top in orderRes:
+
+		print("----------- TOP",topN,"FOR",top[0],"-----------------")
+
+		for i in range(len(top[1])):
+
+			rank = i
+
+			ngram = top[1][i][0]
+
+			c_ngram = top[1][i][1]
+
+			print(i,ngram,c_ngram)
+
+		print("----------- TOP",topN,"FOR",top[0],"-----------------")
+
+	exit()
+
+if __name__ == '__main__':
+	
+	main()
 
 exit()

@@ -3,74 +3,74 @@
 import pickle
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk import ngrams
+from collections import OrderedDict
+from multiprocessing import Pool
 
 filename = "WOS.p"
 VOCAB = {}
-LABELS = {}
+LABELS = OrderedDict()
 
-# def countSentence(sentence, label):
-# 	wordsAdded = []
-# 	for i in sentence:
-# 		key = VOCAB.get(label)
-# 		if key == None:
-# 			VOCAB[label] = {i:1}
-# 			wordsAdded.append(i)
-# 		else:
-# 			keyVocab = key.get(i)
-# 			if keyVocab == None:
-# 				key[i] = 1
-# 				wordsAdded.append(i)
-# 			elif i not in wordsAdded:
-# 				key[i] = keyVocab + 1
-# 				wordsAdded.append(i)
+def countSentenceNGram(label, sentences, n):
+	
+	VOCAB = {}
 
-def countSentenceNGram(sentence, label):
-	wordsAdded = []
-	for i in sentence:
-		word = " ".join(list(i))
-		key = VOCAB.get(label)
-		if key == None:
-			VOCAB[label] = {word:1}
-			wordsAdded.append(word)
-		else:
-			keyVocab = key.get(word)
-			if keyVocab == None:
-				key[word] = 1
-				wordsAdded.append(word)
-			elif word not in wordsAdded:
-				key[word] = keyVocab + 1
-				wordsAdded.append(word)
+	VOCAB[label] = {}
 
-def main():
+	for sentence in sentences:
+
+		sentence = list(word_tokenize(sentence))
+		sentence = set(list(ngrams(sentence, n)))
+
+		wordsAdded = {}
+		for i in sentence:
+			word = " ".join(list(i))
+			if word not in VOCAB[label]:
+				VOCAB[label][word] = 0
+			VOCAB[label][word] += 1
+
+	sortedList = sorted(VOCAB[label].items(), key=lambda x: x[1], reverse=True)
+
+	return (label,sortedList,n)
+
+def topLevelDict():
+
 	mainData = pickle.load(open(filename, "rb"))
-	for i in mainData:
-		sentence = list(word_tokenize(i[0]))
 
-		# Comment for unigram
-		sentence = list(ngrams(sentence, 2))
-		# print(list(sixgrams))
-		# print("")
-		labels = i[1]
-		for j in labels:
-			key = LABELS.get(j)
-			if key == None:
-				LABELS[j] = 1 
-			else:
-				LABELS[j] = key + 1
+	for a in mainData:
 
-			# For n gram
-			countSentenceNGram(sentence, j)
+		for l in a[1]:
 
-			# For unigram
-			# countSentence(sentence, j)
+			if l not in LABELS:
 
-	for i in VOCAB:
-		sortedList = sorted(VOCAB[i].items(), key=lambda x: x[1], reverse=True)
-		print("---------------------------")
-		print(i + "\t" + str(LABELS[i]))
-		print("---------------------------")
-		for j in range(100):
-			print(str(j + 1) + ". " + sortedList[j][0] + "\t" + str(sortedList[j][1]))
-		print("")
+				LABELS[l] = []
 
-main()
+			LABELS[l].append(a[0])
+	
+topLevelDict()
+
+keys = []
+
+sentences = []
+
+n = 2
+
+for key in list(LABELS.keys()):
+
+	keys.append((key,LABELS[key],2))
+
+ngramPool = Pool()
+
+map = ngramPool.starmap_async(countSentenceNGram,keys)
+
+ngramPool.close()
+
+ngramPool.join()
+
+res = map.get(timeout=0)
+
+
+print(res[0][0])
+print(res[0][1][:100])
+
+
+exit()

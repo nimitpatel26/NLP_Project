@@ -2,9 +2,9 @@ import pickle
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk import ngrams
 from collections import OrderedDict
-from multiprocessing import Pool
+from multiprocessing import Pool,Manager,Value
 
-filename = "WOS.p"
+filename = "./WOS.p"
 
 # Top N entries to be found
 
@@ -12,37 +12,53 @@ topN = 500
 
 # ngram length
 
-n = 6
+n = 2
 
-def countSentenceNGram(label, sentences, n):
-	
+# if your data has already been tokenized and split into ngrams with n matching that above
+
+pretokened = False
+
+def countSentenceNGram(sentences):
+
 	v_dict = {}
 
-	for sentence in sentences:
+	count = 0
 
-		sentence = word_tokenize(sentence)
-		sentence = ngrams(sentence, n)
+	for sentence in sentences[1]:
 
-		for i in sentence:
+		if(not pretokened): 
+			sentence = list(word_tokenize(sentence))
+		else:
+			sentence = sentence.split(" ")
+		
+		sentence = list(ngrams(sentence, n))
+
+		for gram in sentence:
 			wordsAdded = {}
-			word = " ".join(i)
+			word = " ".join(gram)
 			if word not in v_dict:
 				v_dict[word] = 0
 			if word not in wordsAdded:
 				wordsAdded[word] = 0
 				v_dict[word] += 1
 
+		if(count % 10000 == 0):
+
+			print(sentences[0],count,"/",len(sentences[1]))
+
+		count += 1
+
 	sortedList = sorted(v_dict.keys() , key = lambda x: v_dict[x], reverse=True)
 
-	return (label,v_dict,sortedList,n)
+	return (sentences[0],v_dict,sortedList,n)
 
 # Group abstracts into a dictionary where highest level label is the specialization and the lower is abstracts in that spec
 
-def groupByLabelIntoDict(file):
+def groupByLabelIntoDict(f):
 
 	labels = OrderedDict()
 
-	data = pickle.load(open(file, "rb"))
+	data = pickle.load(open(f, "rb"))
 
 	for a in data:
 
@@ -58,11 +74,9 @@ def groupByLabelIntoDict(file):
 
 ngramRes = 0 
 
-def topNotIn(i):
+def topNotIn(i,ngramRes):
 
 	global topN
-
-	global ngramRes
 
 	counter = 0
 
@@ -72,11 +86,15 @@ def topNotIn(i):
 
 	while c < len(ngramRes[i][2]) and counter < topN:
 
+		ngram = ngramRes[i][2][c]
+
+		c_ngram = ngramRes[i][1][ngram]
+
 		isNotIn = True
 
 		for i2 in ngramRes:
 
-			if(ngramRes[i][2][c][0] in i2[2][:c+1] and ngramRes[i][0] != i2[0]):
+			if(ngram in i2[1] and ngramRes[i][0] != i2[0] and c_ngram <= i2[1][ngram]):
 
 				isNotIn = False
 
@@ -86,33 +104,35 @@ def topNotIn(i):
 
 			counter += 1
 
+			if(counter%(topN/10) == 0):
+
+				print(ngramRes[i][0],counter)
+
 		c += 1
+
+	print("Completed")
 
 	return ngramRes[i][0],topNList
 
-def main(): 
+if __name__ == '__main__':
 
-	global filname
+	manager = Manager()
 
-	global ngramRes
+	groupedDict = groupByLabelIntoDict(filename)
 
-	global topN
-
-	global n
-
-	labels = groupByLabelIntoDict(filename)
+	# tuples = manager.list()
 
 	tuples = []
 
-	sentences = []
+	for k in groupedDict:
 
-	for key in list(labels.keys()):
+		tuples.append((k,groupedDict[k]))
 
-		tuples.append((key,labels[key],n))
+	del groupedDict
 
 	ngramPool = Pool()
 
-	map = ngramPool.starmap_async(countSentenceNGram,tuples)
+	map = ngramPool.map_async(countSentenceNGram,tuples)
 
 	ngramPool.close()
 
@@ -120,23 +140,30 @@ def main():
 
 	ngramRes = map.get(timeout=0)
 
-	del labels
-
 	del tuples
 
 	print("Got ngram results")
 
+	# ngramRes = manager.list(list(ngramRes))
+
 	ngramRes = list(ngramRes)
 
 	topNPool = Pool()
+
+	map = []
 	
-	map = topNPool.map_async(topNotIn,range(len(ngramRes)))
+	for i in range(len(ngramRes)):
+
+		map.append(topNPool.apply_async(topNotIn,args=(i,ngramRes)))
 
 	topNPool.close()
 
 	topNPool.join()
 
-	orderRes = map.get(timeout=0)
+	orderRes = []
+
+	for p in map:
+		orderRes.append(p.get(timeout=0))
 
 	del ngramRes
 
@@ -156,10 +183,4 @@ def main():
 
 		print("----------- TOP",topN,"FOR",top[0],"-----------------")
 
-	exit()
-
-if __name__ == '__main__':
-	
-	main()
-
-exit()
+# exit()

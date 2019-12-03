@@ -13,7 +13,7 @@ allSpec = {}
 
 def main():
 
-	mainData = pickle.load(open("arXivSpec.p", "rb"))
+	mainData = pickle.load(open("arXivSpec2grams.p", "rb"))
 	for i in mainData:
 		# If a specialization is not in allSpec keys, then add it
 		for spec in i[1][0:1]:

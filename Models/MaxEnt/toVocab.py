@@ -6,19 +6,19 @@ from multiprocessing import Pool,Manager
 import multiprocessing as mp
 import gc
 
-filename = "./arXivSpecMergedTokens.p"
+filename = "./WOS.p"
 
 # Top N entries to be found
 
-topN = 50
+topN = 500
 
 # ngram length
 
-n = 1
+n = 2
 
 # if your data has already been tokenized and split into ngrams with n matching that above
 
-pretokened = True
+pretokened = False
 
 def countSentenceNGram(sentences):
 

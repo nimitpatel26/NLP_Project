@@ -117,9 +117,9 @@ def topNotIn(i,ngramRes):
 
 				c_ngram_other_label = i2[1][ngram]
 
-				c_abstracts_other_label = i2[3]
+				c_ngrams_other_label = i2[3]
 
-				p_ngram_other_label = c_ngram_other_label / c_abstracts_other_label
+				p_ngram_other_label = c_ngram_other_label / c_ngrams_other_label
 
 				# The likelyhood that the ngram is found for a abstract of this ngram is lower than one of a different label
 

@@ -6,15 +6,15 @@ from multiprocessing import Pool,Manager
 import multiprocessing as mp
 import gc
 
-filename = "./WOS.p"
+filename = "WOS.p"
 
 # Top N entries to be found
 
-topN = 50
+topN = 500
 
 # ngram length
 
-n = 2
+n = 1
 
 # if your data has already been tokenized and split into ngrams with n matching that above
 
@@ -123,7 +123,7 @@ def topNotIn(i,ngramRes):
 
 				# The likelyhood that the ngram is found for a abstract of this ngram is lower than one of a different label
 
-				if(p_ngram_this_label <= p_ngram_other_label):
+				if(p_ngram_this_label <= p_ngram_other_label * 3):
 
 					isNotIn = False
 
@@ -237,6 +237,8 @@ if __name__ == '__main__':
 
 	topSeqString = ""
 
+	topSeqArr = []
+
 	for top in topNRes:
 
 		print("----------- TOP",topN,"FOR",top[0],"-----------------")
@@ -251,9 +253,15 @@ if __name__ == '__main__':
 
 			print(i,ngram,c_ngram)
 
+			topSeqArr.append(ngram)
+
 			topSeqString += "\"" + ngram +"\"" + ", "
 
 		print("----------- TOP",topN,"FOR",top[0],"-----------------")
+
+	with open("top"+str(topN)+filename.split(".")[0]+str(n)+"grams.p","wb") as handle:
+
+		pickle.dump(topSeqArr,handle)
 
 	print(topSeqString.replace("\\","\\\\"))
 

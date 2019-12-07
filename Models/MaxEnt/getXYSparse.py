@@ -21,26 +21,6 @@ FILES_PER_LABEL = {}
 VOCAB = list(pickle.load(open("top50WOS1grams.p","rb"))) + list(pickle.load(open("top50WOS2grams.p","rb")))
 LABELS = {"CS":0, "Medical":1, "Civil":2, "ECE":3, "biochemistry":4, "MAE":5, "Psychology ":6}
 
-
-
-# def countVocab(sentence, label):
-# 	wordsAdded = []
-# 	for i in sentence:
-# 		key = DATA.get(label)
-# 		if key == None:
-# 			DATA[label] = {i:1}
-# 			wordsAdded.append(i)
-# 		else:
-# 			keyVocab = key.get(i)
-# 			if keyVocab == None:
-# 				key[i] = 1
-# 			elif i not in wordsAdded:
-# 				key[i] = keyVocab + 1
-# 				wordsAdded.append(i)
-
-# def getData():
-# 	None
-
 featureDict = OrderedDict()
 
 for j in range(0,len(VOCAB)):
@@ -192,45 +172,28 @@ def main():
 
 	X = vstack([res[i][0] for i in range(0,len(res)) if i % 10 != 0],format = "csr")
 	
-	Y = [item for sublist in range(0,len(res)) for item in res[sublist][1] if sublist % 10 != 0]
+	Y = np.array( [ item for sublist in range(0,len(res)) for item in res[sublist][1] if sublist % 10 != 0 ] )
 	# Y = [res[sublist][1] for sublist in range(0,len(res)) if sublist % 10 != 0]
 
 	print("Got training in \t" +str(time.time()-start) + " s")
 
 	X_test = vstack([res[i][0] for i in range(0,len(res)) if i % 10 == 0], format = "csr")
 	# Y_test = vstack([res[i][1] for i in range(0,len(res)) if i % 10 == 0],format="csr")
-	Y_test = [item for sublist in range(0,len(res)) for item in res[sublist][1] if sublist % 10 == 0]
+	Y_test = np.array( [ item for sublist in range(0,len(res)) for item in res[sublist][1] if sublist % 10 == 0 ] )
+
+	print("Got test in \t" +str(time.time()-start) + " s")
 
 	del mainData
 
 	del argtuples20
 
-	# print(X)
+	with open("XY_WOS.p","wb") as handle:
 
-	# print(Y)
+		pickle.dump([X,Y,X_test,Y_test],handle)
 
-	log_reg = LogisticRegression(multi_class="multinomial",solver="lbfgs", C=1, max_iter=1000,n_jobs=-1)
-
-	# Fit the model
-	print("FITTING THE DATA")
-
-	log_reg.fit(X,Y)
-
-	# Make prediction
-	print("MAKING PREDICTIONS")
-	Y_pred = log_reg.predict(X_test)
-
-	# print(Y_pred.tolist())
-
-	# Calculate accuracy, precision, and recall
-	print("PRINTING STATISTICS")
-	acc = accuracy_score(y_true = Y_test, y_pred = Y_pred)
-	prec = precision_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
-	recall = recall_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
-	print ("accuracy = " + str(acc))
-	print ("precision = " + str(prec))
-	print ("recall = " + str(recall))
+	exit()
 
 # prevent recursive multiprocessing in windows
 if __name__ == '__main__':
+
 	main()

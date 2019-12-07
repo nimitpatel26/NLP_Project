@@ -10,11 +10,11 @@ filename = "WOS.p"
 
 # Top N entries to be found
 
-topN = 500
+topN = 50
 
 # ngram length
 
-n = 1
+n = 2
 
 # if your data has already been tokenized and split into ngrams with n matching that above
 
@@ -39,17 +39,17 @@ def countSentenceNGram(sentences):
 		else:
 
 			sentence = sentence.split(" ") 
-
-		for i in range((len(sentence)-n+1)):
-			wordsAdded = {}
-			word = " ".join(sentence[i:i+n])
-			# print(" ".join(sentence[i:i+n]))
+		
+		for i in range( ( len(sentence)-n+1 ) ):
+			
+			word = " ".join( sentence[i:i+n] )
+			
 			if word not in v_dict:
+			
 				v_dict[word] = 0
-			if word not in wordsAdded:
-				wordsAdded[word] = 0
-				v_dict[word] += 1
-				gram_counter += 1
+
+			v_dict[word] += 1
+			gram_counter += 1
 
 		if(a_counter % 10000 == 0):
 
@@ -123,7 +123,7 @@ def topNotIn(i,ngramRes):
 
 				# The likelyhood that the ngram is found for a abstract of this ngram is lower than one of a different label
 
-				if(p_ngram_this_label <= p_ngram_other_label * 3):
+				if( p_ngram_this_label <= p_ngram_other_label * 3):
 
 					isNotIn = False
 
@@ -131,9 +131,9 @@ def topNotIn(i,ngramRes):
 
 					break  
 
-		if(isNotIn): 
+		if( isNotIn ): 
 
-			topNList.append((ngram,c_ngram_this_label))
+			topNList.append( ( ngram,c_ngram_this_label ) )
 
 			counter += 1
 
@@ -147,7 +147,7 @@ def topNotIn(i,ngramRes):
 
 	# return the label that the list is associated with and the list itself 
 
-	return (this_label,topNList)
+	return ( this_label , topNList )
 
 # async functions for pool with apply_async need a callback for some reason
 # callback function for getting topN lists 
@@ -257,7 +257,7 @@ if __name__ == '__main__':
 
 			topSeqString += "\"" + ngram +"\"" + ", "
 
-		print("----------- TOP",topN,"FOR",top[0],"-----------------")
+		print("----------- TOP" , topN , "FOR" , top[0] , "-----------------")
 
 	with open("top"+str(topN)+filename.split(".")[0]+str(n)+"grams.p","wb") as handle:
 

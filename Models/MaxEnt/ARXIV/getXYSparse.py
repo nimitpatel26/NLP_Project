@@ -15,7 +15,7 @@ import time
 import numpy as np
 import math
 
-pretokened = False
+pretokened = True
 DATA = {}
 FILES_PER_LABEL = {}
 VOCAB = list(pickle.load(open("top500arXivSpecMergedTokens1grams.p","rb"))) + list(pickle.load(open("top500arXivSpecMergedTokens2grams.p","rb")))

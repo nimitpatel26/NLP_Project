@@ -10,11 +10,11 @@ filename = "WOS.p"
 
 # Top N entries to be found
 
-topN = 50
+topN = 500
 
 # ngram length
 
-n = 2
+n = 1
 
 # if your data has already been tokenized and split into ngrams with n matching that above
 

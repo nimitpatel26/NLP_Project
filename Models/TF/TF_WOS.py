@@ -11,6 +11,8 @@ from nltk import ngrams
 import sklearn.metrics as metrics
 import tensorflow as tf
 import nltk
+import pydot
+import graphviz
 
 DATA = {}
 FILES_PER_LABEL = {}
@@ -20,8 +22,8 @@ VOCAB = pickle.load(open("top500WOS1grams.p","rb")) + pickle.load(open("top500WO
 NUM_LABELS = 7
 NUM_FEATURES = len(VOCAB)
 BATCH_SIZE = 500
-EPOCHS = 5
-STEPS_PER_EPOCH = 1000
+EPOCHS = 20
+STEPS_PER_EPOCH = 20
 
 LABELS = {"CS":0, "Medical":1, "Civil":2, "ECE":3, "biochemistry":4, "MAE":5, "Psychology ":6}
 
@@ -35,7 +37,6 @@ def nn_batch_generator(X_data, y_data, batch_size):
 	
 	index = np.arange(y_data.shape[0])
 
-	print(index)
 	while 1:
 		index_batch = index[batch_size*counter:batch_size*(counter+1)]
 		X_batch = X_data[index_batch,:].todense()

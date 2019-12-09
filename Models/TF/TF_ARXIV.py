@@ -37,7 +37,6 @@ def nn_batch_generator(X_data, y_data, batch_size):
 	
 	index = np.arange(y_data.shape[0])
 
-	print(index)
 	while 1:
 		index_batch = index[batch_size*counter:batch_size*(counter+1)]
 		X_batch = X_data[index_batch,:].todense()

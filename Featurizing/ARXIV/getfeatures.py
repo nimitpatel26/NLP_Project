@@ -6,7 +6,7 @@ from multiprocessing import Pool,Manager
 import multiprocessing as mp
 import gc
 
-filename = "relabeledNSFfiltered.p"
+filename = "arXivSpecMergedTokens.p"
 
 # Top N entries to be found
 
@@ -71,7 +71,7 @@ def groupByLabelIntoDict(f):
 
 	for a in data:
 
-		for l in a[1]:
+		for l in a[1][:1]:
 
 			if l not in labels:
 

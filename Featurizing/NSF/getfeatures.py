@@ -15,12 +15,11 @@ import time
 import numpy as np
 import math
 
-pretokened = True
+pretokened = False
 DATA = {}
 FILES_PER_LABEL = {}
-VOCAB = list(pickle.load(open("top500arXivSpecMergedTokens1grams.p","rb"))) + list(pickle.load(open("top500arXivSpecMergedTokens2grams.p","rb")))
-LABELS = {'math': 0, 'physics': 1, 'nlin': 2, 'q-bio': 3,
-          'cs': 4, 'stat': 5, 'q-fin': 6, 'econ': 7, 'eess': 8}
+VOCAB = list(pickle.load(open("top500relabeledNSFfiltered1grams.p","rb"))) + list(pickle.load(open("top500relabeledNSFfiltered2grams.p","rb")))
+LABELS = OrderedDict({'ENG': 0, 'MCS': 1, 'EAOS': 2, 'PS': 3, 'BAS': 4, 'SOC': 5, 'PSY': 6, 'ET': 7, 'HLT': 8})
 
 featureDict = OrderedDict()
 
@@ -131,7 +130,7 @@ def main():
 
 	start = time.time()
 
-	mainData = pickle.load(open("arXivSpecMergedTokens.p", "rb"))
+	mainData = pickle.load(open("relabeledNSFfiltered.p", "rb"))
 
 	# split the data array into lists of tuples, each 1/20th the size of the original data
 
@@ -188,7 +187,7 @@ def main():
 
 	del argtuples20
 
-	with open("XY_ARXIV.p","wb") as handle:
+	with open("XY_NSF.p","wb") as handle:
 
 		pickle.dump([X,Y,X_test,Y_test],handle)
 

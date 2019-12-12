@@ -6,35 +6,20 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
-from scipy.sparse import dok_matrix,vstack
+from scipy.sparse import dok_matrix,vstack,coo_matrix,csr_matrix
 from collections import OrderedDict
 from multiprocessing import Pool, Process
+from nltk import word_tokenize
 import multiprocessing as mp
 import time
 import numpy as np
 import math
 
-VOCAB = list(pickle.load(open("top500arXivSpecMergedTokens1grams.p","rb"))) + list(pickle.load(open("top500arXivSpecMergedTokens2grams.p","rb")))
-LABELS = {'math': 0, 'physics': 1, 'nlin': 2, 'q-bio': 3,
-          'cs': 4, 'stat': 5, 'q-fin': 6, 'econ': 7, 'eess': 8}
-
-# def countVocab(sentence, label):
-# 	wordsAdded = []
-# 	for i in sentence:
-# 		key = DATA.get(label)
-# 		if key == None:
-# 			DATA[label] = {i:1}
-# 			wordsAdded.append(i)
-# 		else:
-# 			keyVocab = key.get(i)
-# 			if keyVocab == None:
-# 				key[i] = 1
-# 			elif i not in wordsAdded:
-# 				key[i] = keyVocab + 1
-# 				wordsAdded.append(i)
-
-# def getData():
-# 	None
+pretokened = False
+DATA = {}
+FILES_PER_LABEL = {}
+VOCAB = list(pickle.load(open("top500WOS1grams.p","rb"))) + list(pickle.load(open("top500WOS2grams.p","rb")))
+LABELS = OrderedDict({"CS":0, "Medical":1, "Civil":2, "ECE":3, "biochemistry":4, "MAE":5, "Psychology ":6})
 
 featureDict = OrderedDict()
 
@@ -66,6 +51,7 @@ def abstractFeatureLabels(abstracts):
 	global featureN
 	global featureDict
 	global LABELS
+	global pretokened
 
 	X = dok_matrix((len(abstracts),len(VOCAB)))
 	# Y =  [ [ 0 for i in range(0,1) ] for j in range(0,len(abstracts)) ]
@@ -75,9 +61,17 @@ def abstractFeatureLabels(abstracts):
 	
 	for a in range(0,len(abstracts)):
 
-		sentence = abstracts[a][0].split(" ")
+		sentence = ""
+		
+		if(pretokened):
 
-		# j = some token in the abstract
+			sentence = abstracts[a][0].split(" ")
+
+		else:
+
+			sentence = word_tokenize(abstracts[a][0])
+
+		# i = some gram in the abstract
 
 		for n in featureN:
 
@@ -103,7 +97,7 @@ def abstractFeatureLabels(abstracts):
 
 	abstracts = None
 
-	return X,Y
+	return (X,Y)
 
 # Instead of creating 20 data splits, create a split for each abstract in the data
 def featureArraysNSplits(data):
@@ -113,7 +107,7 @@ def featureArraysNSplits(data):
 	for a in data:
 		argtuples.append((a[0],a[1]))
 
-	abstractParsingPool = Pool(processes=10)
+	abstractParsingPool = Pool(processes=-1)
 	
 	map = abstractParsingPool.map_async(abstractFeatureLabel,argtuples)
 
@@ -136,7 +130,7 @@ def main():
 
 	start = time.time()
 
-	mainData = pickle.load(open("arXivSpecMergedTokens.p", "rb"))
+	mainData = pickle.load(open("WOS.p", "rb"))
 
 	# split the data array into lists of tuples, each 1/20th the size of the original data
 
@@ -156,7 +150,7 @@ def main():
 
 	# each tuple list will get a process mapped to it, total of 20 processes in the pool
 
-	abstractParsingPool = Pool(processes=10)
+	abstractParsingPool = Pool()
 
 	map = abstractParsingPool.map_async(abstractFeatureLabels,argtuples20)
 
@@ -176,15 +170,16 @@ def main():
 
 	# merge sparse lists for X and merge the label lists for Y using generators
 
-	X = vstack([res[i][0] for i in range(0,len(res)) if i % 10 != 0])
-	Y = [item for sublist in range(0,len(res)) for item in res[sublist][1] if sublist % 10 != 0]
+	X = vstack([res[i][0] for i in range(0,len(res)) if i % 10 != 0],format = "csr")
+	
+	Y = np.array( [ item for sublist in range(0,len(res)) for item in res[sublist][1] if sublist % 10 != 0 ] )
 	# Y = [res[sublist][1] for sublist in range(0,len(res)) if sublist % 10 != 0]
 
 	print("Got training in \t" +str(time.time()-start) + " s")
 
-	X_test = vstack([res[i][0] for i in range(0,len(res)) if i % 10 == 0])
+	X_test = vstack([res[i][0] for i in range(0,len(res)) if i % 10 == 0], format = "csr")
 	# Y_test = vstack([res[i][1] for i in range(0,len(res)) if i % 10 == 0],format="csr")
-	Y_test = [item for sublist in range(0,len(res)) for item in res[sublist][1] if sublist % 10 == 0]
+	Y_test = np.array( [ item for sublist in range(0,len(res)) for item in res[sublist][1] if sublist % 10 == 0 ] )
 
 	print("Got test in \t" +str(time.time()-start) + " s")
 
@@ -192,48 +187,13 @@ def main():
 
 	del argtuples20
 
-	# print(X)
+	with open("XY_WOS.p","wb") as handle:
 
-	# print(Y)
+		pickle.dump([X,Y,X_test,Y_test],handle)
 
-	log_reg = LogisticRegression(multi_class="multinomial",solver="lbfgs", C=1, max_iter=1000,n_jobs=-1)
-
-	# Fit the model
-	print("FITTING THE DATA")
-
-	log_reg.fit(X,Y)
-
-	# Make prediction
-	print("MAKING PREDICTIONS")
-	Y_pred = log_reg.predict(X_test)
-
-	# print(Y_pred.tolist())
-
-	# Calculate accuracy, precision, and recall
-	print("PRINTING STATISTICS")
-	acc = accuracy_score(y_true = Y_test, y_pred = Y_pred)
-	prec = precision_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
-	recall = recall_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
-	print ("accuracy = " + str(acc))
-	print ("precision = " + str(prec))
-	print ("recall = " + str(recall))
-
-	# VOCAB = {}
-	# for i in DATA:
-	# 	print ("--------------------------")
-	# 	print (i + "\t" + str(FILES_PER_LABEL[i]))
-	# 	print ("--------------------------")
-
-	# 	sortedList = sorted(DATA[i].items(), key=lambda x: x[1], reverse=True)
-	# 	for j in range(500):
-	# 		print(str(j + 1) + ".\t" + sortedList[j][0] + "\t\t" + str(sortedList[j][1]))
-			# VOCAB[sortedList[j][0]] = 0
-		# print("")
-	# print("[", end = "")
-	# for i in VOCAB:
-	# 	print ("\"" + i + "\", ", end = "")
-	# print("]")
+	exit()
 
 # prevent recursive multiprocessing in windows
 if __name__ == '__main__':
+
 	main()

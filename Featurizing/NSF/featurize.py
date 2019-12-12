@@ -6,7 +6,7 @@ from multiprocessing import Pool,Manager
 import multiprocessing as mp
 import gc
 
-filename = "WOS.p"
+filename = "relabeledNSFfiltered.p"
 
 # Top N entries to be found
 
@@ -14,7 +14,7 @@ topN = 500
 
 # ngram length
 
-n = 2
+n = 1
 
 # if your data has already been tokenized and split into ngrams with n matching that above
 
@@ -71,7 +71,7 @@ def groupByLabelIntoDict(f):
 
 	for a in data:
 
-		for l in a[1]:
+		for l in a[1][:1]:
 
 			if l not in labels:
 

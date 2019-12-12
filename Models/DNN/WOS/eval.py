@@ -2,6 +2,7 @@
 
 import pickle
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
@@ -9,10 +10,10 @@ from sklearn.metrics import recall_score
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk import ngrams
 import sklearn.metrics as metrics
+import pandas as pd
+from collections import OrderedDict
 import tensorflow as tf
 import nltk
-import pydot
-import graphviz
 
 DATA = {}
 FILES_PER_LABEL = {}
@@ -23,89 +24,63 @@ NUM_LABELS = 7
 NUM_FEATURES = len(VOCAB)
 BATCH_SIZE = 500
 EPOCHS = 20
-STEPS_PER_EPOCH = 20
+STEPS_PER_EPOCH = 100
 
-LABELS = {"CS":0, "Medical":1, "Civil":2, "ECE":3, "biochemistry":4, "MAE":5, "Psychology ":6}
-
-# creates batches from sparse X data(scipy csr_matrix format) and dense y data to hopefully save on memory
-# if batch size is reasonably small, this should save memory quite a bit I think
-def nn_batch_generator(X_data, y_data, batch_size):
-	
-	samples_per_epoch = X_data.shape[0]
-	number_of_batches = samples_per_epoch/batch_size
-	counter=0
-	
-	index = np.arange(y_data.shape[0])
-
-	while 1:
-		index_batch = index[batch_size*counter:batch_size*(counter+1)]
-		X_batch = X_data[index_batch,:].todense()
-		y_batch = y_data[index_batch]
-		counter += 1
-		yield np.array(X_batch),y_batch
-		if (counter > number_of_batches):
-			counter=0
-
-def countVocab(sentence, label):
-	wordsAdded = []
-	for i in sentence:
-		key = DATA.get(label)
-		if key == None:
-			DATA[label] = {i:1}
-			wordsAdded.append(i)
-		else:
-			keyVocab = key.get(i)
-			if keyVocab == None:
-				key[i] = 1
-			elif i not in wordsAdded:
-				key[i] = keyVocab + 1
-				wordsAdded.append(i)
-
-def getData():
-	None
+LABELS = OrderedDict({"CS":0, "Medical":1, "Civil":2, "ECE":3, "biochemistry":4, "MAE":5, "Psychology ":6})
 
 def main():
 
-	mainData = pickle.load(open("XY_WOS.p", "rb"))
+    mainData = pickle.load(open("XY_WOS.p", "rb"))
 
-	X = mainData[0]
-	Y = mainData[1]
-	X_test = mainData[2]
-	Y_test = mainData[3]
+    X = mainData[0]
+    Y = mainData[1]
+    X_test = mainData[2]
+    Y_test = mainData[3]
 
-	# Fit the model
-	print("FITTING THE DATA")
-	# log_reg.fit(X, Y)
-	nn_clf = tf.compat.v2.keras.Sequential([
-		tf.keras.layers.Dense(700, input_dim = NUM_FEATURES, activation = "relu"),
-		tf.keras.layers.Dense(500, activation = "relu"),
-		tf.keras.layers.Dense(300, activation = "relu"),
-		tf.keras.layers.Dense(100, activation = "relu"),
-		tf.keras.layers.Dense(50, activation = "relu"),
-		tf.keras.layers.Dense(20, activation = "relu"),
-		tf.keras.layers.Dense(NUM_LABELS, activation = "softmax")
-    ]) 
+    nn_clf = tf.keras.models.load_model("dnnWOSModel.h5")
+    nn_clf_history = pickle.load(open("dnnWOSTrainHistory.p","rb"))
+    df = pd.DataFrame(nn_clf_history).plot(figsize=(10,5),title="WOS: DNN Model Training History")
+    df.set_xlabel("Training Epoch")
 
-    # Can also use sparse_categorical_accuracy as a metric
-	nn_clf.compile(optimizer=tf.keras.optimizers.RMSprop(learning_rate=1e-3), loss='sparse_categorical_crossentropy', metrics=['mean_squared_error'])
-	#nn_clf.compile(optimizer=tf.keras.optimizers.RMSprop(learning_rate=1e-3), loss='sparse_categorical_crossentropy', metrics=['sparse_categorical_accuracy'])
-	
-	nn_clf_history = nn_clf.fit_generator( nn_batch_generator(X,Y,BATCH_SIZE) , epochs = EPOCHS, steps_per_epoch = STEPS_PER_EPOCH, shuffle = "batch")
+    # Make prediction
+    print("MAKING PREDICTIONS")
+    # Y_pred = log_reg.predict(X_test)
+    classPredict = nn_clf.predict_classes(X_test)
+    y_score = nn_clf.predict(X_test)
 
-	# nn_clf_history = nn_clf.fit(train_batch, epochs = EPOCHS)
 
-	# Make prediction
-	print("MAKING PREDICTIONS")
-	# Y_pred = log_reg.predict(X_test)
-	test_predictionsNN = nn_clf.predict_classes(X_test)
+    # Compute ROC curve and ROC area for each class
+    fpr = dict()
+    tpr = dict()
+    nn_threshold = dict()
+    roc_auc = dict()
 
-	# Calculate accuracy, precision, and recall
-	print("PRINTING STATISTICS")
-	acc = accuracy_score(y_true = Y_test, y_pred = test_predictionsNN)
-	prec = precision_score(y_true = Y_test, y_pred = test_predictionsNN, average = "macro")
-	recall = recall_score(y_true = Y_test, y_pred = test_predictionsNN, average = "macro")
-	print ("accuracy = " + str(acc))
-	print ("precision = " + str(prec))
-	print ("recall = " + str(recall))
+    for i in range(len(LABELS)):
+        fpr[i], tpr[i], _  = metrics.roc_curve(np.array(Y_test) , y_score[:,i] , pos_label=i)
+        roc_auc[i] = metrics.auc(fpr[i], tpr[i])
+
+    plt.figure()
+    plt.plot([0, 1], [0, 1], 'r--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('WOS: DNN Model Receiver operating characteristic curve')
+
+    # Plot of a ROC curve for a specific class
+    for i in range(len(LABELS)):
+        plt.plot(fpr[i], tpr[i], label='ROC curve for label ' + str(i+1) + " " +list(LABELS.keys())[i]  +' (area = %0.2f)' % roc_auc[i])
+        plt.legend(loc="lower right")
+
+    plt.show()
+
+    # Calculate accuracy, precision, and recall
+    print("PRINTING STATISTICS")
+    acc = accuracy_score(y_true = Y_test, y_pred = classPredict)
+    prec = precision_score(y_true = Y_test, y_pred = classPredict, average = "macro")
+    recall = recall_score(y_true = Y_test, y_pred = classPredict, average = "macro")
+    print ("accuracy = " + str(acc))
+    print ("precision = " + str(prec))
+    print ("recall = " + str(recall))
 	
 main()

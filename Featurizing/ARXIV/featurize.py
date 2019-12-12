@@ -15,31 +15,12 @@ import time
 import numpy as np
 import math
 
-pretokened = False
+pretokened = True
 DATA = {}
 FILES_PER_LABEL = {}
-VOCAB = list(pickle.load(open("top500relabeledNSFfiltered1grams.p","rb"))) + list(pickle.load(open("top500relabeledNSFfiltered2grams.p","rb")))
-LABELS = {'ENG': 0, 'MCS': 1, 'EAOS': 2, 'PS': 3, 'BAS': 4, 'SOC': 5, 'PSY': 6, 'ET': 7, 'HLT': 8}
-
-
-
-# def countVocab(sentence, label):
-# 	wordsAdded = []
-# 	for i in sentence:
-# 		key = DATA.get(label)
-# 		if key == None:
-# 			DATA[label] = {i:1}
-# 			wordsAdded.append(i)
-# 		else:
-# 			keyVocab = key.get(i)
-# 			if keyVocab == None:
-# 				key[i] = 1
-# 			elif i not in wordsAdded:
-# 				key[i] = keyVocab + 1
-# 				wordsAdded.append(i)
-
-# def getData():
-# 	None
+VOCAB = list(pickle.load(open("top500arXivSpecMergedTokens1grams.p","rb"))) + list(pickle.load(open("top500arXivSpecMergedTokens2grams.p","rb")))
+LABELS = OrderedDict({'math': 0, 'physics': 1, 'nlin': 2, 'q-bio': 3,
+          'cs': 4, 'stat': 5, 'q-fin': 6, 'econ': 7, 'eess': 8})
 
 featureDict = OrderedDict()
 
@@ -78,6 +59,7 @@ def abstractFeatureLabels(abstracts):
 	Y = []
 
 	# a = some abstract number
+	
 	for a in range(0,len(abstracts)):
 
 		sentence = ""
@@ -149,7 +131,7 @@ def main():
 
 	start = time.time()
 
-	mainData = pickle.load(open("relabeledNSFfiltered.p", "rb"))
+	mainData = pickle.load(open("arXivSpecMergedTokens.p", "rb"))
 
 	# split the data array into lists of tuples, each 1/20th the size of the original data
 
@@ -191,45 +173,28 @@ def main():
 
 	X = vstack([res[i][0] for i in range(0,len(res)) if i % 10 != 0],format = "csr")
 	
-	Y = [item for sublist in range(0,len(res)) for item in res[sublist][1] if sublist % 10 != 0]
+	Y = np.array( [ item for sublist in range(0,len(res)) for item in res[sublist][1] if sublist % 10 != 0 ] )
 	# Y = [res[sublist][1] for sublist in range(0,len(res)) if sublist % 10 != 0]
 
 	print("Got training in \t" +str(time.time()-start) + " s")
 
 	X_test = vstack([res[i][0] for i in range(0,len(res)) if i % 10 == 0], format = "csr")
 	# Y_test = vstack([res[i][1] for i in range(0,len(res)) if i % 10 == 0],format="csr")
-	Y_test = [item for sublist in range(0,len(res)) for item in res[sublist][1] if sublist % 10 == 0]
+	Y_test = np.array( [ item for sublist in range(0,len(res)) for item in res[sublist][1] if sublist % 10 == 0 ] )
+
+	print("Got test in \t" +str(time.time()-start) + " s")
 
 	del mainData
 
 	del argtuples20
 
-	# print(X)
+	with open("XY_ARXIV.p","wb") as handle:
 
-	# print(Y)
+		pickle.dump([X,Y,X_test,Y_test],handle)
 
-	log_reg = LogisticRegression(multi_class="multinomial",solver="lbfgs", C=1, max_iter=1000,n_jobs=-1)
-
-	# Fit the model
-	print("FITTING THE DATA")
-
-	log_reg.fit(X,Y)
-
-	# Make prediction
-	print("MAKING PREDICTIONS")
-	Y_pred = log_reg.predict(X_test)
-
-	# print(Y_pred.tolist())
-
-	# Calculate accuracy, precision, and recall
-	print("PRINTING STATISTICS")
-	acc = accuracy_score(y_true = Y_test, y_pred = Y_pred)
-	prec = precision_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
-	recall = recall_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
-	print ("accuracy = " + str(acc))
-	print ("precision = " + str(prec))
-	print ("recall = " + str(recall))
+	exit()
 
 # prevent recursive multiprocessing in windows
 if __name__ == '__main__':
+
 	main()

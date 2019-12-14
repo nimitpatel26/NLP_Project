@@ -6,6 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.multiclass import OneVsRestClassifier
 import matplotlib.pyplot as plt
 from sklearn import metrics
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
@@ -36,16 +37,16 @@ def main():
 
 	del mainData
 
-	log_reg = LogisticRegression(multi_class="ovr",solver="lbfgs", C=.1, max_iter=10000,n_jobs=-1)
+	nb = MultinomialNB()
 
 	# Fit the model
 	print("FITTING THE DATA")
 
-	log_reg.fit(X,Y)
+	nb.fit(X,Y)
 
-	with open("maxentARXIVModel.p","wb") as handle:
+	with open("nbARXIVModel.p","wb") as handle:
 
-		pickle.dump(log_reg,handle)
+		pickle.dump(nb,handle)
 
 # prevent recursive multiprocessing in windows
 if __name__ == '__main__':

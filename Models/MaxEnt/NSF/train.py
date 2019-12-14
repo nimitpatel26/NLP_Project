@@ -44,56 +44,10 @@ def main():
 	print("FITTING THE DATA")
 
 	fitRes = log_reg.fit(X,Y)
-	
-	y_score = log_reg.decision_function(X_test)
-
-	# Compute ROC curve and ROC area for each class
-	fpr = dict()
-	tpr = dict()
-	roc_auc = dict()
-
-	for i in range(len(LABELS)):
-		fpr[i], tpr[i], _ = metrics.roc_curve(Y_test , y_score[:, i],pos_label=i)
-		roc_auc[i] = metrics.auc(fpr[i], tpr[i])
-
-	plt.figure()
-	plt.plot([0, 1], [0, 1], 'k--')
-	plt.xlim([0.0, 1.0])
-	plt.ylim([0.0, 1.05])
-	plt.xlabel('False Positive Rate')
-	plt.ylabel('True Positive Rate')
-	plt.title('NSF MaxEnt Receiver operating characteristic curve')
-
-	# Plot of a ROC curve for a specific class
-	for i in range(len(LABELS)):
-		plt.plot(fpr[i], tpr[i], label='ROC curve for label ' + str(i+1) + " " +list(LABELS.keys())[i]  +' (area = %0.2f)' % roc_auc[i])
-		
-		plt.legend(loc="lower right")
-	
-	plt.show()
 
 	with open("maxentNSFModel.p","wb") as handle:
 
 		pickle.dump(log_reg,handle)
-
-	# Make prediction
-	print("MAKING PREDICTIONS")
-	Y_pred = log_reg.predict(X_test)
-
-	with open("maxentNSFPredicted.p","wb") as handle:
-
-		pickle.dump(Y_pred,handle)
-
-	# print(Y_pred.tolist())
-
-	# Calculate accuracy, precision, and recall
-	print("PRINTING STATISTICS")
-	acc = accuracy_score(y_true = Y_test, y_pred = Y_pred)
-	prec = precision_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
-	recall = recall_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
-	print ("accuracy = " + str(acc))
-	print ("precision = " + str(prec))
-	print ("recall = " + str(recall))
 
 # prevent recursive multiprocessing in windows
 if __name__ == '__main__':

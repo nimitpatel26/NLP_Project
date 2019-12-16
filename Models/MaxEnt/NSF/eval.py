@@ -22,7 +22,7 @@ LABELS = OrderedDict({'ENG': 0, 'MCS': 1, 'EAOS': 2, 'PS': 3, 'BAS': 4, 'SOC': 5
 
 def main():
 
-	mainData = pickle.load(open("XY_NSF.p","rb"))
+	mainData = pickle.load(open("../../../Data/XY_NSF.p","rb"))
 
 	X = mainData[0]
 
@@ -34,7 +34,7 @@ def main():
 
 	del mainData
 
-	log_reg = pickle.load(open("maxentNSFModel.p","rb"))
+	log_reg = pickle.load(open("../../../Data/maxentNSFModel.p","rb"))
 	
 	y_score = log_reg.decision_function(X_test)
 
@@ -63,7 +63,7 @@ def main():
 	
 	plt.show()
 
-	with open("maxentNSFModel.p","wb") as handle:
+	with open("../../../Data/maxentNSFModel.p","wb") as handle:
 
 		pickle.dump(log_reg,handle)
 
@@ -71,7 +71,7 @@ def main():
 	print("MAKING PREDICTIONS")
 	Y_pred = log_reg.predict(X_test)
 
-	with open("maxentNSFPredicted.p","wb") as handle:
+	with open("../../../Data/maxentNSFPredicted.p","wb") as handle:
 
 		pickle.dump(Y_pred,handle)
 

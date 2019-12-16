@@ -8,7 +8,7 @@ import pickle
 n = 1
 
 # path to dataset, I wouldn't change it since the gitignore might include it 
-datasetPath = "./dataset"
+datasetPath = "../../Data/ARXIV"
 
 # Get all files in the dataset path
 
@@ -120,6 +120,6 @@ if __name__ == '__main__':
         result = result + res
         
         
-    with open("arXivSpecMergedTokens.p", 'wb') as handle:
+    with open("../../Data/arXivSpecMergedTokens.p", 'wb') as handle:
         
         pickle.dump(result, handle, protocol=pickle.HIGHEST_PROTOCOL)

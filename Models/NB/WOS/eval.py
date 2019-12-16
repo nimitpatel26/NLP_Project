@@ -22,7 +22,7 @@ LABELS = OrderedDict({"CS":0, "Medical":1, "Civil":2, "ECE":3, "biochemistry":4,
 
 def main():
 
-	mainData = pickle.load(open("XY_WOS.p","rb"))
+	mainData = pickle.load(open("../../../Data/XY_WOS.p","rb"))
 
 	X = mainData[0]
 
@@ -34,7 +34,7 @@ def main():
 
 	del mainData
 
-	log_reg = pickle.load(open("nbWOSModel.p","rb"))
+	log_reg = pickle.load(open("../../../Data/nbWOSModel.p","rb"))
 
 	# Make prediction
 	print("MAKING PREDICTIONS")
@@ -68,7 +68,7 @@ def main():
 	
 	# plt.show()
 
-	with open("nbWOSPredicted.p","wb") as handle:
+	with open("../../../Data/nbWOSPredicted.p","wb") as handle:
 
 		pickle.dump(Y_pred,handle)
 

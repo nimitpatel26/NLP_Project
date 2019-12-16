@@ -6,7 +6,7 @@ from multiprocessing import Pool,Manager
 import multiprocessing as mp
 import gc
 
-filename = "arXivSpecMergedTokens.p"
+filename = "../../Data/arXivSpecMergedTokens.p"
 
 # Top N entries to be found
 
@@ -14,7 +14,7 @@ topN = 500
 
 # ngram length
 
-n = 1
+n = 2
 
 # if your data has already been tokenized and split into ngrams with n matching that above
 
@@ -259,7 +259,7 @@ if __name__ == '__main__':
 
 		print("----------- TOP" , topN , "FOR" , top[0] , "-----------------")
 
-	with open("top"+str(topN)+filename.split(".")[0]+str(n)+"grams.p","wb") as handle:
+	with open("../../Data/top"+str(topN)+filename.split("/")[-1].split(".")[0]+str(n)+"grams.p","wb") as handle:
 
 		pickle.dump(topSeqArr,handle)
 

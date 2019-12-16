@@ -23,7 +23,7 @@ LABELS = OrderedDict({'ENG': 0, 'MCS': 1, 'EAOS': 2, 'PS': 3, 'BAS': 4, 'SOC': 5
 
 def main():
 
-	mainData = pickle.load(open("XY_NSF.p","rb"))
+	mainData = pickle.load(open("../../../Data/XY_NSF.p","rb"))
 
 	X = mainData[0]
 
@@ -46,7 +46,7 @@ def main():
 
 	fitRes = nb.fit(X,Y)
 
-	with open("nbNSFModel.p","wb") as handle:
+	with open("../../../Data/nbNSFModel.p","wb") as handle:
 
 		pickle.dump(nb,handle)
 

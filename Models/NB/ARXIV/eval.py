@@ -24,7 +24,7 @@ LABELS = OrderedDict({'math': 0, 'physics': 1, 'nlin': 2, 'q-bio': 3,
 
 def main():
 
-	mainData = pickle.load(open("XY_ARXIV.p","rb"))
+	mainData = pickle.load(open("../../../Data/XY_ARXIV.p","rb"))
 
 	X = mainData[0]
 
@@ -36,7 +36,7 @@ def main():
 
 	del mainData
 
-	nb = pickle.load(open("nbARXIVModel.p","rb"))
+	nb = pickle.load(open("../../../Data/nbARXIVModel.p","rb"))
 
 	# Make prediction
 	print("MAKING PREDICTIONS")
@@ -69,7 +69,7 @@ def main():
 	
 	# plt.show()
 
-	with open("nbARXIVPredicted.p","wb") as handle:
+	with open("../../../Data/nbARXIVPredicted.p","wb") as handle:
 
 		pickle.dump(Y_pred,handle)
 

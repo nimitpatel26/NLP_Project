@@ -18,7 +18,7 @@ import math
 pretokened = False
 DATA = {}
 FILES_PER_LABEL = {}
-VOCAB = list(pickle.load(open("top500WOS1grams.p","rb"))) + list(pickle.load(open("top500WOS2grams.p","rb")))
+VOCAB = list(pickle.load(open("../../Data/top500WOS1grams.p","rb"))) + list(pickle.load(open("../../Data/top500WOS2grams.p","rb")))
 LABELS = OrderedDict({"CS":0, "Medical":1, "Civil":2, "ECE":3, "biochemistry":4, "MAE":5, "Psychology ":6})
 
 featureDict = OrderedDict()
@@ -130,7 +130,7 @@ def main():
 
 	start = time.time()
 
-	mainData = pickle.load(open("WOS.p", "rb"))
+	mainData = pickle.load(open("../../Data/WOS.p", "rb"))
 
 	# split the data array into lists of tuples, each 1/20th the size of the original data
 
@@ -187,7 +187,7 @@ def main():
 
 	del argtuples20
 
-	with open("XY_WOS.p","wb") as handle:
+	with open("../../Data/XY_WOS.p","wb") as handle:
 
 		pickle.dump([X,Y,X_test,Y_test],handle)
 

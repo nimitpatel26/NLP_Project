@@ -6,7 +6,7 @@ from multiprocessing import Pool,Manager
 import multiprocessing as mp
 import gc
 
-filename = "WOS.p"
+filename = "../../Data/relabeledNSFfiltered.p"
 
 # Top N entries to be found
 
@@ -259,7 +259,9 @@ if __name__ == '__main__':
 
 		print("----------- TOP" , topN , "FOR" , top[0] , "-----------------")
 
-	with open("top"+str(topN)+filename.split(".")[0]+str(n)+"grams.p","wb") as handle:
+	
+
+	with open("../../Data/top"+str(topN)+filename.split("/")[-1].split(".")[0]+str(n)+"grams.p","wb") as handle:
 
 		pickle.dump(topSeqArr,handle)
 

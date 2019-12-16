@@ -1,268 +1,199 @@
+
+
 import pickle
-from nltk.tokenize import sent_tokenize, word_tokenize
-from nltk import ngrams
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from scipy.sparse import dok_matrix,vstack,coo_matrix,csr_matrix
 from collections import OrderedDict
-from multiprocessing import Pool,Manager
+from multiprocessing import Pool, Process
+from nltk import word_tokenize
 import multiprocessing as mp
-import gc
-
-filename = "relabeledNSFfiltered.p"
-
-# Top N entries to be found
-
-topN = 500
-
-# ngram length
-
-n = 1
-
-# if your data has already been tokenized and split into ngrams with n matching that above
+import time
+import numpy as np
+import math
 
 pretokened = False
+DATA = {}
+FILES_PER_LABEL = {}
+VOCAB = list(pickle.load(open("../../Data/top500relabeledNSFfiltered1grams.p","rb"))) + list(pickle.load(open("../../Data/top500relabeledNSFfiltered2grams.p","rb")))
+LABELS = OrderedDict({'ENG': 0, 'MCS': 1, 'EAOS': 2, 'PS': 3, 'BAS': 4, 'SOC': 5, 'PSY': 6, 'ET': 7, 'HLT': 8})
 
-def countSentenceNGram(sentences):
+featureDict = OrderedDict()
 
-	global n
+for j in range(0,len(VOCAB)):
+	featureDict[VOCAB[j]] = j
 
-	v_dict = {}
+def abstractFeatureLabel(abstract):
 
-	a_counter = 0
+	global featureDict
+	global LABELS
 
-	gram_counter = 0
+	X = dok_matrix((1,len(VOCAB)))
+	Y = dok_matrix((1,1))
 
-	for sentence in sentences[1]:
+	for j in abstract[0]:
 
-		if(not pretokened):
+		if j in featureDict:
 
-			sentence = list(word_tokenize(sentence))
+			X[0,featureDict[j]] = 1
+
+	Y[0,0] = LABELS[abstract[1][0]]
+
+	return X,Y
+
+featureN = [1,2]
+
+def abstractFeatureLabels(abstracts):
+
+	global featureN
+	global featureDict
+	global LABELS
+	global pretokened
+
+	X = dok_matrix((len(abstracts),len(VOCAB)))
+	# Y =  [ [ 0 for i in range(0,1) ] for j in range(0,len(abstracts)) ]
+	Y = []
+
+	# a = some abstract number
+	
+	for a in range(0,len(abstracts)):
+
+		sentence = ""
+		
+		if(pretokened):
+
+			sentence = abstracts[a][0].split(" ")
 
 		else:
 
-			sentence = sentence.split(" ") 
-		
-		for i in range( ( len(sentence)-n+1 ) ):
-			
-			word = " ".join( sentence[i:i+n] )
-			
-			if word not in v_dict:
-			
-				v_dict[word] = 0
+			sentence = word_tokenize(abstracts[a][0])
 
-			v_dict[word] += 1
-			gram_counter += 1
+		# i = some gram in the abstract
 
-		if(a_counter % 10000 == 0):
+		for n in featureN:
 
-			print(sentences[0],a_counter,"/",len(sentences[1]))
+			for i in range((len(sentence)-n+1)):
 
-		a_counter += 1
+				gram = " ".join(sentence[i:i+n])
 
-	sortedList = sorted(v_dict.keys() , key = lambda x: v_dict[x], reverse=True)
+				if gram in featureDict:
 
-	return (sentences[0],v_dict,sortedList,gram_counter)
+					X[a,featureDict[gram]] = 1
 
-# Group abstracts into a dictionary where highest level label is the specialization and the lower is abstracts in that spec
+				del gram
 
-def groupByLabelIntoDict(f):
+				gram = None
 
-	labels = OrderedDict()
+		del sentence
 
-	data = pickle.load(open(f, "rb"))
+		sentence = None
+
+		Y.append(LABELS[abstracts[a][1][0]])
+
+	del abstracts
+
+	abstracts = None
+
+	return (X,Y)
+
+# Instead of creating 20 data splits, create a split for each abstract in the data
+def featureArraysNSplits(data):
+
+	argtuples = []
 
 	for a in data:
+		argtuples.append((a[0],a[1]))
 
-		for l in a[1][:1]:
+	abstractParsingPool = Pool(processes=-1)
+	
+	map = abstractParsingPool.map_async(abstractFeatureLabel,argtuples)
 
-			if l not in labels:
+	abstractParsingPool.close()
 
-				labels[l] = []
+	abstractParsingPool.join()
 
-			labels[l].append(a[0])
+	del argtuples
+	
+	argtuples = None
+	
+	res = map.get(timeout=0)
 
-	del data
+	return res
 
-	data = None
 
-	return labels
-
-def topNotIn(i,ngramRes):
-
-	global topN
-
-	counter = 0
-
-	c = 0
-
-	topNList = []
-
-	this_label = ngramRes[i][0]
-
-	c_grams_this_label = ngramRes[i][3]
-
-	while c < len(ngramRes[i][2]) and counter < topN:
-
-		ngram = ngramRes[i][2][c]
-
-		c_ngram_this_label = ngramRes[i][1][ngram]
-
-		p_ngram_this_label = c_ngram_this_label / c_grams_this_label
-
-		isNotIn = True
-
-		for i2 in ngramRes:
-
-			other_label = i2[0]
-
-			if(ngram in i2[1] and this_label != other_label):
-
-				c_ngram_other_label = i2[1][ngram]
-
-				c_ngrams_other_label = i2[3]
-
-				p_ngram_other_label = c_ngram_other_label / c_ngrams_other_label
-
-				# The likelyhood that the ngram is found for a abstract of this ngram is lower than one of a different label
-
-				if( p_ngram_this_label <= p_ngram_other_label * 3):
-
-					isNotIn = False
-
-					# break loop to avoid any more comparisons 
-
-					break  
-
-		if( isNotIn ): 
-
-			topNList.append( ( ngram,c_ngram_this_label ) )
-
-			counter += 1
-
-			# if(counter%(topN/10) == 0):
-
-			# 	print(ngramRes[i][0],counter)
-
-		c += 1
-
-	print(this_label,"Completed")
-
-	# return the label that the list is associated with and the list itself 
-
-	return ( this_label , topNList )
-
-# async functions for pool with apply_async need a callback for some reason
-# callback function for getting topN lists 
-
-topNRes = []
-
-def topNCallback(result):
-
-	global topNRes
-
-	topNRes.append(result)
-
-if __name__ == '__main__':
-
-	# for each new process created, spawn a new process rather than fork since windows does not support fork
-	# this has the implication that child processes spawned by this one do not share memory from the parent in the same way they do with fork
-	# if we were only developing on unix based systems that support fork we could have left this to default and behavior would be the same across systems
-	# learn more about start methods here https://docs.python.org/3.4/library/multiprocessing.html
+def main():
 
 	mp.set_start_method("spawn")
 
-	# create ordered dictionary of the abstracts with key being the abstract label and value being the abstracts for the label
+	start = time.time()
 
-	groupedDict = groupByLabelIntoDict(filename)
+	mainData = pickle.load(open("../../Data/relabeledNSFfiltered.p", "rb"))
 
-	# create list of tuples of ( key, value ) from the grouped dict to pass into the functions 
+	# split the data array into lists of tuples, each 1/20th the size of the original data
 
-	tuples = []
+	argtuples20 = []
 
-	for k in groupedDict:
+	for a in range(0,20):
 
-		tuples.append((k,groupedDict[k]))
+		argtuples20.append(list([]))
 
-	# sort the tuples by number of abstracts associated with each to speed up processing when one label has many more
+	for a in range(0,len(mainData)):
 
-	tuples.sort(key=lambda tup: len(tup[1]),reverse=True)
+		argtuples20[a%20].append((mainData[a][0],mainData[a][1]))
 
-	del groupedDict
+	del mainData
 
-	groupedDict = None 
+	mainData = None
 
-	# force memory collection
+	# each tuple list will get a process mapped to it, total of 20 processes in the pool
 
-	gc.collect() 
+	abstractParsingPool = Pool()
 
-	# pool of processes to get our ngram counts for all abstracts in each label
+	map = abstractParsingPool.map_async(abstractFeatureLabels,argtuples20)
 
-	ngramPool = mp.Pool()
+	abstractParsingPool.close()
 
-	map = ngramPool.map_async(countSentenceNGram,tuples)
+	abstractParsingPool.join()
 
-	ngramPool.close()
-
-	ngramPool.join()
-
-	ngramRes = map.get(timeout=0)
-
-	del tuples
-
-	tuples = None
-
-	print("Got ngram results")
-
-	# ngramRes = manager.list(list(ngramRes))
-
-	ngramRes = list(ngramRes)
-
-	topNPool = mp.Pool()
-
-	map = []
+	# get the results from the processes that processed the data
 	
-	for i in range( len(ngramRes) ):
+	res = map.get(timeout=0)
 
-		map.append( topNPool.apply_async(topNotIn, args = (i,ngramRes), callback = topNCallback ) )
+	del argtuples20
 
-	topNPool.close()
+	argtuples20 = None
 
-	topNPool.join()
+	print("Got result in \t" +str(time.time()-start) + " s")
 
-	for i in map:
+	# merge sparse lists for X and merge the label lists for Y using generators
 
-		i.wait()
+	X = vstack([res[i][0] for i in range(0,len(res)) if i % 10 != 0],format = "csr")
+	
+	Y = np.array( [ item for sublist in range(0,len(res)) for item in res[sublist][1] if sublist % 10 != 0 ] )
+	# Y = [res[sublist][1] for sublist in range(0,len(res)) if sublist % 10 != 0]
 
-	del ngramRes
+	print("Got training in \t" +str(time.time()-start) + " s")
 
-	ngramRes = None
+	X_test = vstack([res[i][0] for i in range(0,len(res)) if i % 10 == 0], format = "csr")
+	# Y_test = vstack([res[i][1] for i in range(0,len(res)) if i % 10 == 0],format="csr")
+	Y_test = np.array( [ item for sublist in range(0,len(res)) for item in res[sublist][1] if sublist % 10 == 0 ] )
 
-	topSeqString = ""
+	print("Got test in \t" +str(time.time()-start) + " s")
 
-	topSeqArr = []
+	del mainData
 
-	for top in topNRes:
+	del argtuples20
 
-		print("----------- TOP",topN,"FOR",top[0],"-----------------")
+	with open("../../Data/XY_NSF.p","wb") as handle:
 
-		for i in range(len(top[1])):
+		pickle.dump([X,Y,X_test,Y_test],handle)
 
-			rank = i
+	exit()
 
-			ngram = top[1][i][0]
+# prevent recursive multiprocessing in windows
+if __name__ == '__main__':
 
-			c_ngram = top[1][i][1]
-
-			print(i,ngram,c_ngram)
-
-			topSeqArr.append(ngram)
-
-			topSeqString += "\"" + ngram +"\"" + ", "
-
-		print("----------- TOP" , topN , "FOR" , top[0] , "-----------------")
-
-	with open("top"+str(topN)+filename.split(".")[0]+str(n)+"grams.p","wb") as handle:
-
-		pickle.dump(topSeqArr,handle)
-
-	print(topSeqString.replace("\\","\\\\"))
-
-# exit()
+	main()

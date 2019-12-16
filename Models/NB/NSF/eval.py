@@ -35,35 +35,34 @@ def main():
 	del mainData
 
 	nb = pickle.load(open("nbNSFModel.p","rb"))
-	
-	# y_score = nb.decision_function(X_test)
+	y_score = nb.predict_proba(X_test)
 
-	# # Compute ROC curve and ROC area for each class
-	# fpr = dict()
-	# tpr = dict()
-	# roc_auc = dict()
+	# Compute ROC curve and ROC area for each class
+	fpr = dict()
+	tpr = dict()
+	roc_auc = dict()
 
-	# for i in range(len(LABELS)):
-	# 	fpr[i], tpr[i], _ = metrics.roc_curve(Y_test , y_score[:, i],pos_label=i)
-	# 	roc_auc[i] = metrics.auc(fpr[i], tpr[i])
+	for i in range(len(LABELS)):
+	 	fpr[i], tpr[i], _ = metrics.roc_curve(Y_test , y_score[:, i],pos_label=i)
+	 	roc_auc[i] = metrics.auc(fpr[i], tpr[i])
 
-	# plt.figure()
-	# plt.plot([0, 1], [0, 1], 'k--')
-	# plt.xlim([0.0, 1.0])
-	# plt.ylim([0.0, 1.05])
-	# plt.xlabel('False Positive Rate')
-	# plt.ylabel('True Positive Rate')
-	# plt.title('NSF: Naive Bayes Model Receiver operating characteristic curve')
+	plt.figure()
+	plt.plot([0, 1], [0, 1], 'k--')
+	plt.xlim([0.0, 1.0])
+	plt.ylim([0.0, 1.05])
+	plt.xlabel('False Positive Rate')
+	plt.ylabel('True Positive Rate')
+	plt.title('NSF: Naive Bayes Model Receiver operating characteristic curve')
 
-	# # Plot of a ROC curve for a specific class
-	# for i in range(len(LABELS)):
-	# 	plt.plot(fpr[i], tpr[i], label='ROC curve for label ' + str(i+1) + " " +list(LABELS.keys())[i]  +' (area = %0.2f)' % roc_auc[i])
+	# Plot of a ROC curve for a specific class
+	for i in range(len(LABELS)):
+	 	plt.plot(fpr[i], tpr[i], label='ROC curve for label ' + str(i+1) + " " +list(LABELS.keys())[i]  +' (area = %0.2f)' % roc_auc[i])
 		
-	# 	plt.legend(loc="lower right")
+	 	plt.legend(loc="lower right")
 	
-	# plt.show()
+	plt.show()
 
-	# Make prediction
+	#Make prediction
 	print("MAKING PREDICTIONS")
 	Y_pred = nb.predict(X_test)
 

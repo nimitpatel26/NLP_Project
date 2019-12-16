@@ -24,7 +24,7 @@ LABELS = OrderedDict({'math': 0, 'physics': 1, 'nlin': 2, 'q-bio': 3,
 
 def main():
 
-	mainData = pickle.load(open("XY_ARXIV.p","rb"))
+	mainData = pickle.load(open("../../../Data/XY_ARXIV.p","rb"))
 
 	X = mainData[0]
 
@@ -43,7 +43,7 @@ def main():
 
 	log_reg.fit(X,Y)
 
-	with open("maxentARXIVModel.p","wb") as handle:
+	with open("../../../Data/maxentARXIVModel.p","wb") as handle:
 
 		pickle.dump(log_reg,handle)
 

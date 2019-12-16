@@ -20,71 +20,71 @@ import numpy as np
 import math
 
 LABELS = OrderedDict({'math': 0, 'physics': 1, 'nlin': 2, 'q-bio': 3,
-  'cs': 4, 'stat': 5, 'q-fin': 6, 'econ': 7, 'eess': 8})
+          'cs': 4, 'stat': 5, 'q-fin': 6, 'econ': 7, 'eess': 8})
 
 def main():
 
-    mainData = pickle.load(open("XY_ARXIV.p","rb"))
+	mainData = pickle.load(open("../../../Data/XY_ARXIV.p","rb"))
 
-    X = mainData[0]
+	X = mainData[0]
 
-    Y = mainData[1]
+	Y = mainData[1]
 
-    X_test = mainData[2]
+	X_test = mainData[2]
 
-    Y_test = mainData[3]
+	Y_test = mainData[3]
 
-    del mainData
+	del mainData
 
-    nb = pickle.load(open("nbARXIVModel.p","rb"))
-    # Make prediction
-    print("MAKING PREDICTIONS")
-    Y_pred = nb.predict(X_test)
-    
-    
-    y_score = nb.predict_proba(X_test)
+	nb = pickle.load(open("../../../Data/nbARXIVModel.p","rb"))
 
-    # Compute ROC curve and ROC area for each class
-    fpr = dict()
-    tpr = dict()
-    roc_auc = dict()
+	# Make prediction
+	print("MAKING PREDICTIONS")
+	Y_pred = nb.predict(X_test)
 
-    for i in range(len(LABELS)):
-        fpr[i], tpr[i], _ = metrics.roc_curve(Y_test , y_score[:, i],pos_label=i)
-        roc_auc[i] = metrics.auc(fpr[i], tpr[i])
+	y_score = nb.predict_proba(X_test)
 
-    plt.figure()
-    plt.plot([0, 1], [0, 1], 'k--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
+	# Compute ROC curve and ROC area for each class
+	fpr = dict()
+	tpr = dict()
+	roc_auc = dict()
 
-    plt.title('ARXIV: Naive Bayes Model Receiver operating characteristic curve')
+	for i in range(len(LABELS)):
+		fpr[i], tpr[i], _ = metrics.roc_curve(Y_test , y_score[:, i],pos_label=i)
+		roc_auc[i] = metrics.auc(fpr[i], tpr[i])
 
-    # Plot of a ROC curve for a specific class
-    for i in range(len(LABELS)):
-        plt.plot(fpr[i], tpr[i], label='ROC curve for label ' + str(i+1) + " " +list(LABELS.keys())[i]  +' (area = %0.2f)' % roc_auc[i])
+	plt.figure()
+	plt.plot([0, 1], [0, 1], 'k--')
+	plt.xlim([0.0, 1.0])
+	plt.ylim([0.0, 1.05])
+	plt.xlabel('False Positive Rate')
+	plt.ylabel('True Positive Rate')
+
+	plt.title('NSF: Naive Bayes Model Receiver operating characteristic curve')
+
+	# Plot of a ROC curve for a specific class
+	for i in range(len(LABELS)):
+		plt.plot(fpr[i], tpr[i], label='ROC curve for label ' + str(i+1) + " " +list(LABELS.keys())[i]  +' (area = %0.2f)' % roc_auc[i])
 		
-    plt.legend(loc="lower right")
-	
-    plt.show()
+	plt.legend(loc="lower right")
 
-    with open("nbARXIVPredicted.p","wb") as handle:
+	plt.show()
 
-        pickle.dump(Y_pred,handle)
+	with open("../../../Data/nbARXIVPredicted.p","wb") as handle:
 
-    # print(Y_pred.tolist())
+		pickle.dump(Y_pred,handle)
 
-    # Calculate accuracy, precision, and recall
-    print("PRINTING STATISTICS")
-    acc = accuracy_score(y_true = Y_test, y_pred = Y_pred)
-    prec = precision_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
-    recall = recall_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
-    print ("accuracy = " + str(acc))
-    print ("precision = " + str(prec))
-    print ("recall = " + str(recall))
+	# print(Y_pred.tolist())
 
-    # prevent recursive multiprocessing in windows
+	# Calculate accuracy, precision, and recall
+	print("PRINTING STATISTICS")
+	acc = accuracy_score(y_true = Y_test, y_pred = Y_pred)
+	prec = precision_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
+	recall = recall_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
+	print ("accuracy = " + str(acc))
+	print ("precision = " + str(prec))
+	print ("recall = " + str(recall))
+
+# prevent recursive multiprocessing in windows
 if __name__ == '__main__':
-    main()
+	main()

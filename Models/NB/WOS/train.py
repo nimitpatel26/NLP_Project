@@ -23,7 +23,7 @@ LABELS = OrderedDict({"CS":0, "Medical":1, "Civil":2, "ECE":3, "biochemistry":4,
 
 def main():
 
-	mainData = pickle.load(open("XY_WOS.p","rb"))
+	mainData = pickle.load(open("../../../Data/XY_WOS.p","rb"))
 
 	X = mainData[0]
 
@@ -42,7 +42,7 @@ def main():
 
 	nb.fit(X,Y)
 
-	with open("nbWOSModel.p","wb") as handle:
+	with open("../../../Data/nbWOSModel.p","wb") as handle:
 
 		pickle.dump(nb,handle)
 

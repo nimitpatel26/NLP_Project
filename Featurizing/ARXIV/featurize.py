@@ -18,7 +18,7 @@ import math
 pretokened = True
 DATA = {}
 FILES_PER_LABEL = {}
-VOCAB = list(pickle.load(open("top500arXivSpecMergedTokens1grams.p","rb"))) + list(pickle.load(open("top500arXivSpecMergedTokens2grams.p","rb")))
+VOCAB = list(pickle.load(open("../../Data/top500arXivSpecMergedTokens1grams.p","rb"))) + list(pickle.load(open("../../Data/top500arXivSpecMergedTokens2grams.p","rb")))
 LABELS = OrderedDict({'math': 0, 'physics': 1, 'nlin': 2, 'q-bio': 3,
           'cs': 4, 'stat': 5, 'q-fin': 6, 'econ': 7, 'eess': 8})
 
@@ -131,7 +131,7 @@ def main():
 
 	start = time.time()
 
-	mainData = pickle.load(open("arXivSpecMergedTokens.p", "rb"))
+	mainData = pickle.load(open("../../Data/arXivSpecMergedTokens.p", "rb"))
 
 	# split the data array into lists of tuples, each 1/20th the size of the original data
 
@@ -188,7 +188,7 @@ def main():
 
 	del argtuples20
 
-	with open("XY_ARXIV.p","wb") as handle:
+	with open("../../Data/XY_ARXIV.p","wb") as handle:
 
 		pickle.dump([X,Y,X_test,Y_test],handle)
 

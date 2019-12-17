@@ -49,8 +49,10 @@ def main():
 	tpr = dict()
 	roc_auc = dict()
 
-	with open("../../../Data/ROC_Curves/MaxEnt WOS.p","wb") as handle:		
-		pickle.dump((metrics.roc_curve(label_binarize(Y_test,classes=list(LABELS.values())).ravel(),y_score.ravel()),metrics.roc_auc_score(label_binarize(Y_test,classes=list(LABELS.values())),label_binarize(Y_pred,classes=list(LABELS.values())))),handle)
+	with open("../../../Data/ROC_Curves/MaxEnt WOS.p","wb") as handle:
+		curve = metrics.roc_curve(label_binarize(Y_test,classes=list(LABELS.values())).ravel(),y_score.ravel())
+		auc = metrics.roc_auc_score(label_binarize(Y_test,classes=list(LABELS.values())),label_binarize(Y_pred,classes=list(LABELS.values())),average="micro")		
+		pickle.dump((curve,auc),handle)
 
 
 	for i in range(len(LABELS)):

@@ -12,11 +12,13 @@ from sklearn.metrics import recall_score
 from scipy.sparse import dok_matrix,vstack
 from collections import OrderedDict
 from multiprocessing import Pool, Process
+from sklearn.preprocessing import label_binarize
 from sklearn import metrics
 import multiprocessing as mp
 import time
 import numpy as np
 import math
+from statistics import mean
 
 LABELS = OrderedDict({'math': 0, 'physics': 1, 'nlin': 2, 'q-bio': 3,
           'cs': 4, 'stat': 5, 'q-fin': 6, 'econ': 7, 'eess': 8})
@@ -48,9 +50,12 @@ def main():
 	tpr = dict()
 	roc_auc = dict()
 
+	avg_precision = dict()
+	avg_recall = dict()
 	for i in range(len(LABELS)):
 		fpr[i], tpr[i], _ = metrics.roc_curve(Y_test , y_score[:, i],pos_label=i)
 		roc_auc[i] = metrics.auc(fpr[i], tpr[i])
+		fpr[i] = list(fpr[i])
 
 	plt.figure()
 	plt.plot([0, 1], [0, 1], 'k--')
@@ -71,6 +76,9 @@ def main():
 	with open("../../../Data/maxentARXIVPredicted.p","wb") as handle:
 
 		pickle.dump(Y_pred,handle)
+
+	with open("../../../Data/ROC_Curves/MaxEnt ARXIV.p","wb") as handle:		
+		pickle.dump((metrics.roc_curve(label_binarize(Y_test,classes=list(LABELS.values())).ravel(),y_score.ravel()),metrics.roc_auc_score(label_binarize(Y_test,classes=list(LABELS.values())),label_binarize(Y_pred,classes=list(LABELS.values())))),handle)
 
 	# print(Y_pred.tolist())
 

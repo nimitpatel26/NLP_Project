@@ -13,6 +13,7 @@ from sklearn.metrics import recall_score
 from scipy.sparse import dok_matrix,vstack
 from collections import OrderedDict
 from multiprocessing import Pool, Process
+from sklearn.preprocessing import label_binarize
 from sklearn import metrics
 import multiprocessing as mp
 import time
@@ -60,7 +61,7 @@ def main():
 	plt.xlabel('False Positive Rate')
 	plt.ylabel('True Positive Rate')
 
-	plt.title('NSF: Naive Bayes Model Receiver operating characteristic curve')
+	plt.title('ARXIV: Naive Bayes Model Receiver operating characteristic curve')
 
 	# Plot of a ROC curve for a specific class
 	for i in range(len(LABELS)):
@@ -73,6 +74,9 @@ def main():
 	with open("../../../Data/nbARXIVPredicted.p","wb") as handle:
 
 		pickle.dump(Y_pred,handle)
+
+	with open("../../../Data/ROC_Curves/NB ARXIV.p","wb") as handle:		
+		pickle.dump((metrics.roc_curve(label_binarize(Y_test,classes=list(LABELS.values())).ravel(),y_score.ravel()),metrics.roc_auc_score(label_binarize(Y_test,classes=list(LABELS.values())),label_binarize(Y_pred,classes=list(LABELS.values())))),handle)
 
 	# print(Y_pred.tolist())
 

@@ -12,6 +12,7 @@ from multiprocessing import Pool, Process
 from nltk import word_tokenize
 from sklearn import metrics
 from sklearn.multiclass import OneVsRestClassifier
+from sklearn.preprocessing import label_binarize
 import matplotlib.pyplot as plt
 import multiprocessing as mp
 import time

@@ -9,6 +9,7 @@ from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk import ngrams
+from sklearn.preprocessing import label_binarize
 import sklearn.metrics as metrics
 import pandas as pd
 from collections import OrderedDict
@@ -72,6 +73,9 @@ def main():
 		plt.legend(loc="lower right")
 
 	plt.show()
+
+	with open("../../../Data/ROC_Curves/DNN ARXIV.p","wb") as handle:		
+		pickle.dump((metrics.roc_curve(label_binarize(Y_test,classes=list(LABELS.values())).ravel(),y_score.ravel()),metrics.roc_auc_score(label_binarize(Y_test,classes=list(LABELS.values())),label_binarize(classPredict,classes=list(LABELS.values())))),handle)
 
 	# Calculate accuracy, precision, and recall
 	print("PRINTING STATISTICS")

@@ -9,7 +9,6 @@ from sklearn import metrics
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
-from sklearn.naive_bayes import MultinomialNB
 from scipy.sparse import dok_matrix,vstack
 from collections import OrderedDict
 from multiprocessing import Pool, Process
@@ -19,36 +18,29 @@ import multiprocessing as mp
 import time
 import numpy as np
 import math
-
-LABELS = OrderedDict({'math': 0, 'physics': 1, 'nlin': 2, 'q-bio': 3,
-          'cs': 4, 'stat': 5, 'q-fin': 6, 'econ': 7, 'eess': 8})
+import os
+from statistics import mean
 
 def main():
 
-	mainData = pickle.load(open("../../../Data/XY_ARXIV.p","rb"))
+    files = [f for f in os.listdir("../Data/ROC_Curves") if f.endswith(".p")]
 
-	
+    plt.figure()
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('All Models Average Receiver operating characteristic curve')
 
-	X = mainData[0]
+    for f in files:
+        content = pickle.load(open("../Data/ROC_Curves/"+f,"rb"))
+        fpr,tpr,_ = content[0]
+        auc = content[1]
+        plt.plot(fpr,tpr,label="ROC Curve for " +f.split(".")[0] +' (area = %0.2f)' % auc)
+        plt.legend(loc="lower right")
 
-	Y = mainData[1]
-
-	X_test = mainData[2]
-
-	Y_test = mainData[3]
-
-	del mainData
-
-	log_reg = LogisticRegression(multi_class="ovr",solver="lbfgs", C=.1, max_iter=10000,n_jobs=-1)
-
-	# Fit the model
-	print("FITTING THE DATA")
-
-	log_reg.fit(X,Y)
-
-	with open("../../../Data/maxentARXIVModel.p","wb") as handle:
-
-		pickle.dump(log_reg,handle)
+    plt.show()
 
 # prevent recursive multiprocessing in windows
 if __name__ == '__main__':

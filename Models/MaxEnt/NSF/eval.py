@@ -86,9 +86,17 @@ def main():
 	# Calculate accuracy, precision, and recall
 	print("PRINTING STATISTICS")
 	acc = accuracy_score(y_true = Y_test, y_pred = Y_pred)
+	print ("accuracy = " + str(acc))
+	print("Macro Averging")
 	prec = precision_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
 	recall = recall_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
-	print ("accuracy = " + str(acc))
+	print("F1 score = " +str(metrics.f1_score(Y_test,Y_pred,average="macro")))
+	print ("precision = " + str(prec))
+	print ("recall = " + str(recall))
+	print("Micro Averging")
+	prec = precision_score(y_true = Y_test, y_pred = Y_pred, average = "micro")
+	recall = recall_score(y_true = Y_test, y_pred = Y_pred, average = "micro")
+	print("F1 score = " +str(metrics.f1_score(Y_test,Y_pred,average="micro")))
 	print ("precision = " + str(prec))
 	print ("recall = " + str(recall))
 

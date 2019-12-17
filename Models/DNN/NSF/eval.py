@@ -86,7 +86,7 @@ def main():
     # Make prediction
     print("MAKING PREDICTIONS")
     # Y_pred = log_reg.predict(X_test)
-    classPredict = nn_clf.predict_classes(X_test)
+    Y_pred = nn_clf.predict_classes(X_test)
     y_score = nn_clf.predict(X_test)
 
     # Compute ROC curve and ROC area for each class
@@ -116,15 +116,23 @@ def main():
 
     with open("../../../Data/ROC_Curves/DNN NSF.p","wb") as handle:
         curve = metrics.roc_curve(label_binarize(Y_test,classes=list(LABELS.values())).ravel(),y_score.ravel())
-        auc = metrics.roc_auc_score(label_binarize(Y_test,classes=list(LABELS.values())),label_binarize(classPredict,classes=list(LABELS.values())),average="micro")		
+        auc = metrics.roc_auc_score(label_binarize(Y_test,classes=list(LABELS.values())),label_binarize(Y_pred,classes=list(LABELS.values())),average="micro")		
         pickle.dump((curve,auc),handle)
 
     # Calculate accuracy, precision, and recall
     print("PRINTING STATISTICS")
-    acc = accuracy_score(y_true = Y_test, y_pred = classPredict)
-    prec = precision_score(y_true = Y_test, y_pred = classPredict, average = "macro")
-    recall = recall_score(y_true = Y_test, y_pred = classPredict, average = "macro")
+    acc = accuracy_score(y_true = Y_test, y_pred = Y_pred)
     print ("accuracy = " + str(acc))
+    print("Macro Averging")
+    prec = precision_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
+    recall = recall_score(y_true = Y_test, y_pred = Y_pred, average = "macro")
+    print("F1 score = " +str(metrics.f1_score(Y_test,Y_pred,average="macro")))
+    print ("precision = " + str(prec))
+    print ("recall = " + str(recall))
+    print("Micro Averging")
+    prec = precision_score(y_true = Y_test, y_pred = Y_pred, average = "micro")
+    recall = recall_score(y_true = Y_test, y_pred = Y_pred, average = "micro")
+    print("F1 score = " +str(metrics.f1_score(Y_test,Y_pred,average="micro")))
     print ("precision = " + str(prec))
     print ("recall = " + str(recall))
 	

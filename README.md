@@ -7,4 +7,3 @@ the NSF Research Award Abstracts 1990-2003 Data Set(NSF) located at: https://arc
 If you wish to be able to run any arbitrary python script within the project without having to first retrieve the datasets and run through the project's pipeline, you can download this file https://drive.google.com/file/d/15JzTPMWe5nHKKLn7v_2TBCvDe3sYAiMV/view?usp=sharing and extract it using 7zip(https://www.7-zip.org/). Otherwise, if you are cloning the project directly from git and don't use the files under /Data/ in the archive in the /Data/ folder in the location you cloned the project to, you will have to run through each step in the pipeline for the project described in the image below(A SVG version is available under /images/ in the repo in case you want to scale up the image to better read the text):
 
 ![Pipeline](images/pipeline.png)
-Format: ![Alt Text](url)
